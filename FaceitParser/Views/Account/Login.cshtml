@@ -1,0 +1,37 @@
+﻿@model FaceitParser.Models.LoginViewModel
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Login</title>
+    <link rel="stylesheet" href="~/css/Login-Form-Dark.css">
+    
+</head>
+
+<div class="flex-container">
+        <div class="content-container">
+        <div class="form-container">
+            <form asp-action="Login" asp-validation-summary="All" asp-controller="Account" asp-antiforgery="true" method="post">
+                <h1>Login</h1>
+                    <br>
+                    <br>
+                    <span class="subtitle">USERNAME:</span>
+                    <br>
+                    <input type="text" name="username" value="">
+                    <br>
+                    <span class="subtitle">PASSWORD:</span>
+                    <br>
+                    <input type="password" name="password" value="">
+            <div class="text-danger"> 
+                @Html.ValidationSummary(false)
+            </div>
+                    <br><br>
+                    <input type="submit" value="SUBMIT" class="submit-btn">
+                </form>
+        
+            </div>
+        </div>
+    </div>
+
+
