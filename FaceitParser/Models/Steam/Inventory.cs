@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using FaceitParser.Helpers;
+using System.Text.Json.Serialization;
 
 namespace FaceitParser.Models
 {

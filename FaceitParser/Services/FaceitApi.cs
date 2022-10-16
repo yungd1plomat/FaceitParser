@@ -18,9 +18,12 @@ namespace FaceitParser.Services
 
         private string selfId { get; set; }
 
-        public FaceitApi(string apiKey, string proxy = null, string proxyType = null)
+        private CancellationToken cancellationToken { get; set; }
+
+        public FaceitApi(string apiKey, CancellationToken cancellationToken, string proxy = null, string proxyType = null)
         {
             Init(apiKey, proxy, proxyType);
+            this.cancellationToken = cancellationToken;
         }
 
         /// <inheritdoc/>
@@ -48,22 +51,21 @@ namespace FaceitParser.Services
             }
             client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
+            client.Timeout = TimeSpan.FromSeconds(10);
         }
 
         /// <inheritdoc/>
         public async Task GetSelf()
         {
-            var response = await client.GetAsync($"{baseUrl}/post/v2/profiles");
+            var response = await client.GetAsync($"{baseUrl}/post/v2/profiles", cancellationToken);
             response.EnsureSuccessStatusCode();
-            var resp = await response.Content.ReadAsStringAsync();
             var stream = await response.Content.ReadAsStreamAsync();
             var content = await JsonSerializer.DeserializeAsync<JsonNode>(stream);
             selfId = content["results"][0]["id"].ToString();
 
             await Task.Delay(300);
 
-            response = await client.GetAsync($"{baseUrl}/post/v1/users/{selfId}");
+            response = await client.GetAsync($"{baseUrl}/post/v1/users/{selfId}", cancellationToken);
             response.EnsureSuccessStatusCode();
             stream = await response.Content.ReadAsStreamAsync();
             content = await JsonSerializer.DeserializeAsync<JsonNode>(stream);
@@ -85,7 +87,7 @@ namespace FaceitParser.Services
                                                                                   $"state=PAUSED&state=ABORTED&" +
                                                                                   $"limit={limit}&" +
                                                                                   $"entityType=matchmaking&" +
-                                                                                  $"offset={offset}");
+                                                                                  $"offset={offset}", cancellationToken);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStreamAsync();
@@ -97,7 +99,7 @@ namespace FaceitParser.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<Player>> GetPlayersAsync(string matchId, int maxLevel = 11)
         {
-            var response = await client.GetAsync($"{baseUrl}/match/v2/match/{matchId}");
+            var response = await client.GetAsync($"{baseUrl}/match/v2/match/{matchId}", cancellationToken);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStreamAsync();
@@ -114,7 +116,7 @@ namespace FaceitParser.Services
             var playerIds = new PlayerIds() { Ids = ids };
             var playersJson = JsonSerializer.Serialize(playerIds);
 
-            var response = await client.PostAsync($"{baseUrl}/user-summary/v1/list", new StringContent(playersJson, Encoding.UTF8, "application/json"));
+            var response = await client.PostAsync($"{baseUrl}/user-summary/v1/list", new StringContent(playersJson, Encoding.UTF8, "application/json"), cancellationToken);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStreamAsync();
 
@@ -132,7 +134,7 @@ namespace FaceitParser.Services
             return ignoredPlayers;
         }
 
-
+        /// <inheritdoc/>
         public async Task AddFriendsAsync(IEnumerable<Player> players)
         {
             if (players.Count() > 99)
@@ -143,7 +145,7 @@ namespace FaceitParser.Services
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             if (selfId is null)
                 throw new Exception("Self Id empty, initialize it");
-            var resp = await client.PostAsync($"{baseUrl}/friend-requests/v1/users/{selfId}/requests", content);
+            var resp = await client.PostAsync($"{baseUrl}/friend-requests/v1/users/{selfId}/requests", content, cancellationToken);
             resp.EnsureSuccessStatusCode();
         }
 

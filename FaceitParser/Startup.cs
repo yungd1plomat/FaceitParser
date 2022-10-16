@@ -1,5 +1,7 @@
-﻿using FaceitParser.Data;
+﻿using FaceitParser.Abstractions;
+using FaceitParser.Data;
 using FaceitParser.Helpers;
+using FaceitParser.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +31,10 @@ namespace FaceitParser
             {
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = "/account/login";
-                options.AccessDeniedPath = "/home/error";
+                options.AccessDeniedPath = "/error";
             });
+            services.AddSingleton<ISteamApi, SteamApi>(api => new SteamApi(Configuration["SteamApiKey"]));
+            services.AddSingleton<IServiceResolver, ServiceResolver>();
             services.AddControllersWithViews();
         }
 

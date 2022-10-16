@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Buffers;
 
-namespace FaceitParser.Helpers.Converters
+namespace FaceitParser.Helpers
 {
     public class StringToLongConverter : JsonConverter<ulong>
     {

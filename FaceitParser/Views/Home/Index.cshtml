@@ -1,0 +1,109 @@
+﻿<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <title>Index | Faceit Parser</title>
+    <link rel="stylesheet" href="~/css/sidebar.css" />
+    <link rel="stylesheet" href="~/css/index.css" />
+    <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet" />
+</head>
+<div class="s-layout">
+    <!-- Sidebar -->
+    <div class="s-layout__sidebar">
+        <a class="s-sidebar__trigger" href="#0">
+            <i class="fa fa-bars"></i>
+        </a>
+        <nav class="s-sidebar__nav">
+            <div class="menu-title">
+                <span>Faceit</span>
+                <span>Scanner</span>
+            </div>
+            <ul>
+                <li>
+                    <a class="s-sidebar__nav-link" href="/"> <i class="fa fa-home"></i><em>Home</em> </a>
+                </li>
+                <li>
+                    <a class="s-sidebar__nav-link" href="parser"> <i class="fa fa-search"></i><em>Parser</em> </a>
+                </li>
+                <li>
+                    <a class="s-sidebar__nav-link" href="blacklist"> <i class="fa fa-user-times"></i><em>Blacklist</em> </a>
+                </li>
+                @if (User.IsInRole("admin"))
+                {
+                    <li>
+                        <a class="s-sidebar__nav-link" href="users"> <i class="fa fa-users"></i><em>Users</em> </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <main class="s-layout__content">
+        <div class="started">
+            <p class="started-boldtext">Welcome to Faceit parser</p>
+            <p class="started-slimtext">You can find</p>
+            <div class="started-items">
+                <div class="itemwrapper">
+                    <div class="started-items-item">
+                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="32.000000pt" height="32.000000pt" viewBox="0 0 32.000000 32.000000" preserveAspectRatio="xMidYMid meet">
+                            <g transform="translate(0.000000,32.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none">
+                                <path d="M69 293 c-36 -22 -59 -64 -59 -107 0 -27 8 -46 34 -74 33 -35 38 -37
+95 -37 55 0 63 -3 95 -34 60 -58 103 -15 45 45 -31 32 -34 40 -34 95 0 57 -2
+62 -37 95 -43 39 -94 45 -139 17z m110 -17 c67 -35 65 -143 -4 -174 -91 -41
+-179 51 -131 137 26 47 84 63 135 37z m81 -201 c18 -19 30 -38 27 -42 -8 -7
+-77 55 -77 69 0 16 17 7 50 -27z" />
+                                <path d="M120 261 c0 -5 12 -12 26 -15 16 -4 30 -18 37 -36 13 -35 27 -39 27
+-10 0 12 -11 32 -25 45 -23 24 -65 34 -65 16z" />
+                            </g>
+                        </svg>
+                    </div>
+                    <p>Parser</p>
+                </div>
+                <div class="itemwrapper">
+                    <div class="started-items-item">
+                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="32.000000pt" height="32.000000pt" viewBox="0 0 32.000000 32.000000" preserveAspectRatio="xMidYMid meet">
+                            <g transform="translate(0.000000,32.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none">
+                                <path d="M92 303 c-79 -39 -112 -134 -73 -210 59 -117 213 -121 279 -8 75 130
+-71 285 -206 218z m140 -24 c14 -8 17 -14 10 -21 -8 -8 -16 -6 -27 6 -25 25
+-60 29 -93 12 -35 -18 -46 -45 -38 -90 5 -27 2 -35 -23 -54 l-30 -22 -6 21
+c-17 53 22 129 79 155 33 15 94 11 128 -7z m-48 -19 c36 -13 33 -30 -15 -75
+-39 -39 -41 -39 -55 -21 -26 35 -13 85 26 99 8 3 16 6 17 6 1 1 13 -3 27 -9z
+m106 -62 c7 -22 9 -51 6 -64 l-6 -24 -31 22 c-23 17 -29 28 -24 45 8 34 -9 28
+-22 -7 -6 -16 -18 -32 -27 -35 -49 -15 -52 -18 -33 -22 10 -3 32 1 48 7 27 11
+32 10 54 -10 l25 -24 -21 -23 c-41 -43 -114 -52 -173 -21 -16 9 -8 21 80 109
+53 54 101 96 106 93 4 -3 12 -23 18 -46z m-205 -98 c-15 -16 -32 -27 -37 -24
+-12 8 31 54 51 54 10 0 6 -9 -14 -30z" />
+                            </g>
+                        </svg>
+                    </div>
+                    <p>Blacklist</p>
+                </div>
+                <div class="itemwrapper">
+                    <div class="started-items-item">
+                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="32.000000pt" height="32.000000pt" viewBox="0 0 32.000000 32.000000" preserveAspectRatio="xMidYMid meet">
+                            <g transform="translate(0.000000,32.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none">
+                                <path d="M121 256 c-20 -24 -5 -65 26 -72 35 -9 66 26 54 59 -10 27 -62 35
+-80 13z m68 -15 c13 -24 -8 -55 -34 -50 -28 6 -42 34 -26 53 18 22 48 20 60
+-3z" />
+                                <path d="M40 225 c-20 -25 -8 -50 25 -50 21 0 31 5 33 18 4 21 -14 47 -33 47
+-7 0 -18 -7 -25 -15z m45 -20 c0 -13 -8 -21 -22 -23 -17 -3 -23 2 -23 16 0 10
+3 22 7 26 13 13 38 1 38 -19z" />
+                                <path d="M230 225 c-18 -22 -1 -50 31 -50 20 0 24 5 24 30 0 23 -5 31 -21 33
+-11 2 -27 -4 -34 -13z m48 -18 c4 -20 -25 -34 -40 -19 -15 15 -1 44 19 40 10
+-2 19 -11 21 -21z" />
+                                <path d="M114 159 c-3 -6 -19 -9 -34 -5 -40 7 -82 -27 -78 -63 3 -23 9 -27 48
+-33 70 -10 188 -9 195 2 3 6 22 10 41 10 30 0 34 3 34 25 0 39 -36 68 -76 62
+-18 -3 -36 -1 -39 4 -8 13 -82 11 -91 -2z m95 -16 c11 -10 24 -33 27 -50 l7
+-33 -83 0 -82 0 6 33 c7 39 39 67 76 67 15 0 37 -8 49 -17z m-136 1 c12 -4 13
+-12 4 -40 -9 -28 -15 -34 -39 -34 -34 0 -38 30 -8 60 22 22 22 22 43 14z m219
+-11 c29 -26 23 -53 -11 -53 -24 0 -31 6 -40 31 -14 41 -15 39 11 39 12 0 30
+-7 40 -17z" />
+                            </g>
+                        </svg>
+                    </div>
+                    <p>Users</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

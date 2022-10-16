@@ -5,7 +5,8 @@ using System.Diagnostics;
 
 namespace FaceitParser.Controllers
 {
-    [Route("\\")]
+    [Authorize]
+    [Route("/")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -15,16 +16,9 @@ namespace FaceitParser.Controllers
             _logger = logger;
         }
 
-        [Route("Index")]
+        [Route("/")]
         [Authorize]
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        [Route("Privacy")]
-        [AllowAnonymous]
-        public IActionResult Privacy()
         {
             return View();
         }
