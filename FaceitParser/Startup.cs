@@ -29,8 +29,7 @@ namespace FaceitParser
             {
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = "/account/login";
-                options.AccessDeniedPath = "/Home/Error";
-                options.ReturnUrlParameter = null;
+                options.AccessDeniedPath = "/home/error";
             });
             services.AddControllersWithViews();
         }

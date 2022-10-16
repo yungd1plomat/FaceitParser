@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace FaceitParser.Controllers
 {
-    [Route("[controller]")]
+    [Route("\\")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
