@@ -134,15 +134,18 @@ namespace FaceitParser.Services
             if (_minPrice == 0)
                 return 0;
             double price = 0;
-            var inventory = await _steamApi.GetInventory(player.ProfileId);
-            var items = inventory.Items.Where(x => x.Tradable);
-            foreach (var item in items)
+            try
             {
-                if (_items.ContainsKey(item.Name))
+                var inventory = await _steamApi.GetInventory(player.ProfileId);
+                var items = inventory.Items.Where(x => x.Tradable);
+                foreach (var item in items)
                 {
-                    price += _items[item.Name];
+                    if (_items.ContainsKey(item.Name))
+                    {
+                        price += _items[item.Name];
+                    }
                 }
-            }
+            } catch { }
             return price;
         }
 
