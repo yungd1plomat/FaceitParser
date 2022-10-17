@@ -2,11 +2,17 @@
     background: #121212;
     width: 100%;
 }
+
 .tasksTable {
     position: absolute;
-    top: 7em;
+    top: 2em;
     margin: 0 10px 0 10px;
+    display: table;
 }
+
+    .tasksTable a {
+        color: #6600ff;
+    }
 
 .add {
     border: 1px solid #c8354e;
@@ -72,7 +78,7 @@ tr:hover td {
 
 @media screen and (max-width: 639px) {
     .tasksTable {
-        top: 10em;
+        top: 5em;
     }
     table {
         border: 0;
@@ -114,4 +120,32 @@ tr:hover td {
         td:last-child {
             border-bottom: 0;
         }
+}
+
+
+.createForm {
+    display: grid;
+}
+
+.createForm p {
+    display: grid;
+}
+
+.createForm span {
+    display: grid;
+}
+
+.submitBtn {
+        width: 200px;
+        justify-self: center;
+    }
+
+.subtitle {
+    font-size: 20px;
+    color: rgb(184, 187, 183);
+}
+
+.text-danger li {
+    color: red;
+    font-size: 13px;
 }

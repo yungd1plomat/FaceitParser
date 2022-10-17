@@ -9,22 +9,26 @@ namespace FaceitParser.Services
     {
         private ISteamApi _steamApi { get; set; }
 
-        public IDictionary<IdentityUser, IDictionary<FaceitService, CancellationTokenSource>> Services { get; set; }
+        public IDictionary<string, IDictionary<FaceitService, CancellationTokenSource>> Services { get; set; }
 
 
         public ServiceResolver(ISteamApi steamApi)
         {
             _steamApi = steamApi;
-            Services = new Dictionary<IdentityUser, IDictionary<FaceitService, CancellationTokenSource>>();
+            Services = new Dictionary<string, IDictionary<FaceitService, CancellationTokenSource>>();
         }
 
 
-        public async Task<IEnumerable<IFaceitService>> Resolve(IdentityUser user)
+        public IEnumerable<FaceitService> Resolve(string user, string name = null)
         {
-            return Services[user].Keys;
+            if (!Services.ContainsKey(user))
+                return Array.Empty<FaceitService>();
+            if (name is null)
+                return Services[user].Keys;
+            return Services[user].Keys.Where(x => x.Name == name);
         }
 
-        public async Task Create(IdentityUser user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, CancellationTokenSource source)
+        public async Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, CancellationTokenSource source)
         {
             FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, source.Token);
             await faceitService.Init();
@@ -36,7 +40,7 @@ namespace FaceitParser.Services
             Services[user].Add(faceitService, source);
         }
 
-        public async Task Remove(IdentityUser user, string name)
+        public async Task Remove(string user, string name)
         {
             if (!Services.ContainsKey(user))
             {

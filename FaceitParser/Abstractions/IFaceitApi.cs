@@ -3,6 +3,9 @@ using System.Numerics;
 
 namespace FaceitParser.Abstractions
 {
+    /// <summary>
+    /// Имплементация фейсит апи
+    /// </summary>
     public interface IFaceitApi
     {
         /// <summary>

@@ -1,7 +1,12 @@
-﻿<head>
+﻿@using FaceitParser.Abstractions
+@using Microsoft.AspNetCore.Identity
+@inject IServiceResolver serviceResolver
+@inject UserManager<IdentityUser> userManager
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Index | Faceit Parser</title>
+    <title>Parsers | Faceit Parser</title>
     <link rel="stylesheet" href="~/css/sidebar.css" />
     <link rel="stylesheet" href="~/css/parser.css" />
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet" />
@@ -39,6 +44,9 @@
     <!-- Content -->
     <main class="s-layout__content">
         <div class="tasksTable">
+            <div class="text-danger">
+                @Html.ValidationSummary(false)
+            </div>
             <button class="add">Add</button>
             <table>
                 <thead>
@@ -51,31 +59,20 @@
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td data-th="Name" scope="row">Scner2323</td>
-                        <td data-th="Account">fdsdfsdfdsf</td>
-                        <td data-th="Delay">350</td>
-                        <td data-th="Action"><a href="home">Del</a></td>
-                    </tr>
-
-                    <tr>
-                        <td data-th="Name" scope="row">Scner2323</td>
-                        <td data-th="Account">fdsdfsdfdsf</td>
-                        <td data-th="Delay">350</td>
-                        <td data-th="Action"><a href="home">Del</a></td>
-                    </tr>
-                    <tr>
-                        <td data-th="Name" scope="row">Scner2323</td>
-                        <td data-th="Account">fdsdfsdfdsf</td>
-                        <td data-th="Delay">350</td>
-                        <td data-th="Action"><a href="home">Del</a></td>
-                    </tr>
-                    <tr>
-                        <td data-th="Name" scope="row">Scner2323</td>
-                        <td data-th="Account">fdsdfsdfdsf</td>
-                        <td data-th="Delay">350</td>
-                        <td data-th="Action"><a href="home">Del</a></td>
-                    </tr>
+                    @{
+                        var user = await userManager.GetUserAsync(User);
+                        var parsers = serviceResolver.Resolve(user.Id);
+                        foreach (var parser in parsers)
+                        {
+                                <tr>
+                                <td data-th="Name" scope="row"><a href="/parser/@parser.Name">@parser.Name</a></td>
+                                    <td data-th="Account">@parser.faceitApi.SelfNick</td>
+                                    <td data-th="Delay">@parser.Delay</td>
+                                    <td data-th="Action"><a href="home">Delete</a></td>
+                                </tr>
+                        }
+                    }
+                    
                     <tr>
                         <td data-th="Name" scope="row">Scner2323</td>
                         <td data-th="Account">fdsdfsdfdsf</td>

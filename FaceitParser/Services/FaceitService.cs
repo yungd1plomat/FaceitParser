@@ -29,8 +29,10 @@ namespace FaceitParser.Services
 
         public int Added;
 
+
         public ConcurrentQueue<string> Logs { get; set; }
 
+        public FaceitApi faceitApi { get; set; }
 
 
         private Dictionary<string, double> _items { get; set; }
@@ -41,28 +43,30 @@ namespace FaceitParser.Services
 
         private Location _location { get; set; }
 
-        private FaceitApi _faceitApi { get; set; }
-
         private CancellationToken _cancellationToken { get; set; }
 
         private ConcurrentQueue<Player> _players { get; set; }
 
 
-        public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitApi, int delay, int maxLvl, CancellationToken cancellationToken)
+        public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, CancellationToken cancellationToken)
         {
             _steamApi = steamApi;
             _location = location;
             _maxLevel = maxLvl;
-            _faceitApi = faceitApi;
             _cancellationToken = cancellationToken;
+            faceitApi = faceitapi;
             Name = name;
             Delay = delay;
+            Logs = new ConcurrentQueue<string>();
+            _players = new ConcurrentQueue<Player>();
         }
 
         public async Task Init()
         {
             //_items = await _steamApi.GetItems(); Не забыть поменять
             _items = await new SteamApi("qE4I4rd6hcjPl8CwYp4fW0Z4Lzc").GetItems();
+            Logs.Enqueue($"Авторизованы как {faceitApi.SelfNick}");
+            Logs.Enqueue($"Получено {_items.Count()} предметов с маркета");
         }
 
         public async Task Start()
@@ -70,10 +74,10 @@ namespace FaceitParser.Services
             Games = 0;
             Total = 0;
             Parsed = 0;
-            Logs = new ConcurrentQueue<string>();
-            _players = new ConcurrentQueue<Player>();
-            await LoopGames().ConfigureAwait(false);
-            await LoopPlayers().ConfigureAwait(false);
+            Logs.Clear();
+            _players.Clear();
+            //Task.Run(async () => await LoopGames());
+            //Task.Run(async () => await LoopPlayers());
         }
 
         public async Task LoopGames()
@@ -81,9 +85,11 @@ namespace FaceitParser.Services
             int offset = 0;
             while (!_cancellationToken.IsCancellationRequested)
             {
+                Logs.Enqueue("test");
+                /*
                 try
                 {
-                    var gameIds = await _faceitApi.GetGameIdsAsync(_location.Region, offset);
+                    var gameIds = await faceitApi.GetGameIdsAsync(_location.Region, offset);
                     if (!gameIds.Any()) {
                         offset = 0;
                         Logs.Enqueue("Начинаем парсинг с начала");
@@ -94,25 +100,24 @@ namespace FaceitParser.Services
                     {
                         Interlocked.Increment(ref Games);
 
-                        var initPlayers = await _faceitApi.GetPlayersAsync(gameId, _maxLevel);
+                        var initPlayers = await faceitApi.GetPlayersAsync(gameId, _maxLevel);
                         if (!initPlayers.Any())
                             continue;
                         Interlocked.Add(ref Total, initPlayers.Count());
                         await Task.Delay(Delay);
 
-                        var players = await _faceitApi.GetPlayersAsync(initPlayers, _location.Countries, _location.IgnoreCountries);
+                        var players = await faceitApi.GetPlayersAsync(initPlayers, _location.Countries, _location.IgnoreCountries);
                         if (!players.Any())
                             continue;
                         Interlocked.Add(ref Parsed, players.Count());
-
                     }
                     offset += gameIds.Count();
-                    await Task.Delay(Delay);
                 } 
                 catch (Exception ex)
                 {
                     Logs.Enqueue(ex.Message);
-                }
+                }*/
+                await Task.Delay(Delay);
             }
         }
 
@@ -129,7 +134,7 @@ namespace FaceitParser.Services
                         chunkPlayers.Add(result);
                         count++;
                     }
-                    await _faceitApi.AddFriendsAsync(chunkPlayers);
+                    await faceitApi.AddFriendsAsync(chunkPlayers);
                 }
                 await Task.Delay(LOOP_DELAY);
             }
@@ -137,7 +142,7 @@ namespace FaceitParser.Services
 
         public void Dispose()
         {
-            _faceitApi.Dispose();
+            faceitApi.Dispose();
         }
     }
 }
