@@ -80,5 +80,24 @@ namespace FaceitParser.Controllers
             return Redirect($"~/parser/{model.Name}");
         }
 
+        [HttpPost("{name}")]
+        public async Task<IActionResult> GetData(string name)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var service = _serviceResolver.Resolve(user.Id, name).FirstOrDefault();
+            if (service == default)
+                return RedirectToAction("Parser");
+            GetParserViewmodel model = new GetParserViewmodel()
+            {
+                Account = service.faceitApi.SelfNick,
+                Added = service.Added,
+                Delay = service.Delay,
+                Games = service.Games,
+                Parsed = service.Parsed,
+                Total = service.Total,
+                Logs = service.Logs.DequeueAll(),
+            };
+            return Ok(model);
+        }
     }
 }

@@ -65,8 +65,8 @@ namespace FaceitParser.Services
         {
             //_items = await _steamApi.GetItems(); Не забыть поменять
             _items = await new SteamApi("qE4I4rd6hcjPl8CwYp4fW0Z4Lzc").GetItems();
-            Logs.Enqueue($"Авторизованы как {faceitApi.SelfNick}");
-            Logs.Enqueue($"Получено {_items.Count()} предметов с маркета");
+            Log($"Авторизованы как {faceitApi.SelfNick}");
+            Log($"Получено {_items.Count()} предметов с маркета");
         }
 
         public async Task Start()
@@ -74,10 +74,8 @@ namespace FaceitParser.Services
             Games = 0;
             Total = 0;
             Parsed = 0;
-            Logs.Clear();
-            _players.Clear();
-            //Task.Run(async () => await LoopGames());
-            //Task.Run(async () => await LoopPlayers());
+            Task.Run(async () => await LoopGames());
+            Task.Run(async () => await LoopPlayers());
         }
 
         public async Task LoopGames()
@@ -85,14 +83,12 @@ namespace FaceitParser.Services
             int offset = 0;
             while (!_cancellationToken.IsCancellationRequested)
             {
-                Logs.Enqueue("test");
-                /*
                 try
                 {
                     var gameIds = await faceitApi.GetGameIdsAsync(_location.Region, offset);
                     if (!gameIds.Any()) {
                         offset = 0;
-                        Logs.Enqueue("Начинаем парсинг с начала");
+                        Log("Начинаем парсинг с начала");
                         continue;
                     }
                     await Task.Delay(Delay);
@@ -109,14 +105,19 @@ namespace FaceitParser.Services
                         var players = await faceitApi.GetPlayersAsync(initPlayers, _location.Countries, _location.IgnoreCountries);
                         if (!players.Any())
                             continue;
+                        foreach (var player in players)
+                        {
+                            Log($"Спарсили {player.Nick} - {player.Level} LVL ({player.Country})");
+                            //_players.Enqueue(player);
+                        }
                         Interlocked.Add(ref Parsed, players.Count());
                     }
                     offset += gameIds.Count();
                 } 
                 catch (Exception ex)
                 {
-                    Logs.Enqueue(ex.Message);
-                }*/
+                    Log(ex.Message);
+                }
                 await Task.Delay(Delay);
             }
         }
@@ -135,9 +136,19 @@ namespace FaceitParser.Services
                         count++;
                     }
                     await faceitApi.AddFriendsAsync(chunkPlayers);
+                    foreach (var player in chunkPlayers)
+                    {
+                        Log($"Добавили {player.Nick}");
+                    }
                 }
                 await Task.Delay(LOOP_DELAY);
             }
+        }
+
+        private void Log(string message)
+        {
+            var date = DateTime.Now.ToString("hh:mm:ss");
+            Logs.Enqueue($"[{date}] {message}");
         }
 
         public void Dispose()
