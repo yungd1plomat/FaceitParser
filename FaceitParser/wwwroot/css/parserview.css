@@ -6,17 +6,57 @@
 .logsContainer {
     height: 700px;
     width: 100%;
-    margin: 2rem;
     overflow-y: scroll;
+    background: rgb(28, 30, 31);
 }
 
 .logsContainer p {
     color: #fff;
+    margin: 20px 0 0 20px;
 }
 
 .parserContent {
+    margin: 2rem;
     position: absolute;
     top: 5em;
     width: 80vw;
     display: inline-grid;
+}
+
+.infoContainer {
+    display: block;
+    grid-template-columns: auto auto auto;
+    place-items: center;
+    margin-bottom: 2rem;
+    border: 2px solid #271E36;
+    text-align: center;
+}
+
+.tittle {
+    width: 100%;
+    height: 50px;
+    position: relative;
+    border-bottom: 1px solid #2f2f2d;
+    color: #fff;
+    font-size: 25px;
+    padding: 10px;
+}
+
+.info {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 21px;
+    color: #fff;
+    line-height: 50px;
+}
+
+@media (min-width: 42em) {
+    .infoContainer {
+        display: inline-grid;
+        text-align: left;
+    }
+
+    .parserContent {
+        top: 2em;
+    }
 }

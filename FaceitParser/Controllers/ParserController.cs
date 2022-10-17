@@ -5,6 +5,8 @@ using FaceitParser.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace FaceitParser.Controllers
 {
@@ -26,8 +28,10 @@ namespace FaceitParser.Controllers
         }
 
         [HttpGet]
-        public IActionResult Parser()
+        public IActionResult Parser(IEnumerable<string> Errors = null)
         {
+            foreach (var error in Errors)
+                ModelState.AddModelError(string.Empty, error);
             return View();
         }
 
@@ -46,7 +50,7 @@ namespace FaceitParser.Controllers
         public async Task<IActionResult> Create([FromForm] CreateParserVm model)
         {
             if (!ModelState.IsValid)
-                return View("Parser");
+                return RedirectToAction("Parser", "Parser", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage)});
             CancellationTokenSource source = new CancellationTokenSource();
             FaceitApi faceitApi = new FaceitApi(model.Token, source.Token, model.Proxy, model.ProxyType);
             try
@@ -70,11 +74,10 @@ namespace FaceitParser.Controllers
             {
                 faceitApi.Dispose();
                 source.Dispose();
-                return View("Parser");
+                return RedirectToAction("Parser", "Parser", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
             }
             await _serviceResolver.Create(user.Id, model.Name, faceitApi, location, (int)model.Delay, model.MaxLvl, source);
-            //return RedirectToAction("ParserView", model.Name);
-            return View("Parser");
+            return Redirect($"~/parser/{model.Name}");
         }
 
     }
