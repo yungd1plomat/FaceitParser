@@ -47,8 +47,10 @@ namespace FaceitParser.Services
 
         private ConcurrentQueue<Player> _players { get; set; }
 
+        private double _minPrice { get; set; }
 
-        public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, CancellationToken cancellationToken)
+
+        public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, int minPrice, CancellationToken cancellationToken)
         {
             _steamApi = steamApi;
             _location = location;
@@ -59,6 +61,7 @@ namespace FaceitParser.Services
             Delay = delay;
             Logs = new ConcurrentQueue<string>();
             _players = new ConcurrentQueue<Player>();
+            _minPrice = minPrice;
         }
 
         public async Task Init()
@@ -107,8 +110,12 @@ namespace FaceitParser.Services
                             continue;
                         foreach (var player in players)
                         {
-                            Log($"Спарсили {player.Nick} - {player.Level} LVL ({player.Country})");
-                            //_players.Enqueue(player);
+                            var price = await GetInventoryPrice(player);
+                            if (price >= _minPrice)
+                            {
+                                Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
+                                //_players.Enqueue(player);
+                            }
                         }
                         Interlocked.Add(ref Parsed, players.Count());
                     }
@@ -120,6 +127,23 @@ namespace FaceitParser.Services
                 }
                 await Task.Delay(Delay);
             }
+        }
+
+        public async Task<double> GetInventoryPrice(Player player)
+        {
+            if (_minPrice == 0)
+                return 0;
+            double price = 0;
+            var inventory = await _steamApi.GetInventory(player.ProfileId);
+            var items = inventory.Items.Where(x => x.Tradable);
+            foreach (var item in items)
+            {
+                if (_items.ContainsKey(item.Name))
+                {
+                    price += _items[item.Name];
+                }
+            }
+            return price;
         }
 
         public async Task LoopPlayers()

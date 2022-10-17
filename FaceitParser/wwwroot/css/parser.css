@@ -149,3 +149,7 @@ tr:hover td {
     color: red;
     font-size: 13px;
 }
+
+.swal2-show {
+    background: #17171a;
+}

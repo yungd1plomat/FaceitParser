@@ -39,6 +39,8 @@ namespace FaceitParser.Controllers
         public async Task<IActionResult> ParserView(string name)
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
             var service = _serviceResolver.Resolve(user.Id, name).FirstOrDefault();
             if (service == default)
                 return RedirectToAction("Parser");
@@ -76,8 +78,18 @@ namespace FaceitParser.Controllers
                 source.Dispose();
                 return RedirectToAction("Parser", "Parser", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
             }
-            await _serviceResolver.Create(user.Id, model.Name, faceitApi, location, (int)model.Delay, model.MaxLvl, source);
+            await _serviceResolver.Create(user.Id, model.Name, faceitApi, location, (int)model.Delay, model.MaxLvl, model.MinPrice, source);
             return Redirect($"~/parser/{model.Name}");
+        }
+
+        [HttpPost("delete")]
+        public async Task<IActionResult> Delete(string name)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
+            _serviceResolver.Remove(user.Id, name);
+            return Ok(name);
         }
 
         [HttpPost("{name}")]

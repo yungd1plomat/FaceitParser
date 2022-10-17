@@ -9,26 +9,29 @@
                     '<span class="subtitle" for="Name">Название</span>' +
                     '<input name="Name" id="Name" class="swal2-input" required>' +
                 '<p>' +
-                    '<span class="subtitle" for="token">Токен</span> ' +
+                    '<span class="subtitle">Токен</span> ' +
                     '<input name="Token" id="Token" class="swal2-input" required>' +
                 '<p>' +
-                    '<span class="subtitle" for="Location">Локация</span> ' +
+                    '<span class="subtitle">Локация</span> ' +
                     '<select name="Location" class="swal2-select inline-flex" id="Location" required>' +
                         '<option value="EU">EU</option>' +
                         '<option value="RU (sng)">RU (sng)</option>' +
                         '<option value="Oceania">Oceania</option>' +
                     '</select> ' +
                 '<p>' +
-                    '<span class="subtitle" for="token">Максимальный лвл</span> ' +
+                    '<span class="subtitle">Максимальный лвл</span> ' +
                     '<input name="MaxLvl" type="number" id="MaxLvl" class="swal2-input" required>' +
                 '<p>' +
-                    '<span class="subtitle" for="token">Задержка (мс)</span> ' +
+                    '<span class="subtitle">Задержка (мс)</span> ' +
                     '<input name="Delay" id="Delay" type="number" class="swal2-input" required>' +
                 '<p>' +
-                    '<span class="subtitle" for="token">Прокси (ip:port:log:pass)</span> ' +
+                    '<span class="subtitle">Инвентарь от ($)</span> ' +
+                    '<input name="MinPrice" id="MinPrice" type="number" class="swal2-input" required>' +
+                '<p>' +
+                    '<span class="subtitle">Прокси (ip:port:log:pass)</span> ' +
                     '<input name="Proxy" id="Proxy" class="swal2-input">' +
                 '<p>' +
-                    '<span class="subtitle" for="Location">Тип прокси</span> ' +
+                    '<span class="subtitle">Тип прокси</span> ' +
                     '<select name="ProxyType" class="swal2-select inline-flex" id="ProxyType">' +
                         '<option value="http">http</option>' +
                         '<option value="https">https</option>' +
@@ -36,10 +39,34 @@
                         '<option value="socks5">socks5</option>' +
                     '</select> ' +
                 '<p>' +
-                    '<input type="submit" value="SUBMIT" class="swal2-confirm swal2-styled submitBtn">' +
+                    '<input type="submit" value="Создать" class="swal2-confirm swal2-styled submitBtn">' +
                 '</form>',
             showCancelButton: false,
             showConfirmButton: false
         })
     });
 });
+
+function Delete(parserName) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("../parser/delete", { name: parserName })
+                .done(function () {
+                    $("#" + parserName).parent().parent().remove();
+                    Swal.fire(
+                        'Deleted!',
+                        'Parser has been deleted.',
+                        'success'
+                    )
+                });
+        }
+    })
+}

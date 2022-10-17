@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using FaceitParser.Helpers;
+using System.Text.Json.Serialization;
 
 namespace FaceitParser.Models
 {
@@ -11,7 +12,8 @@ namespace FaceitParser.Models
         public string Nick { get; set; }
 
         [JsonPropertyName("gameId")]
-        public string ProfileId { get; set; }
+        [JsonConverter(typeof(StringToLongConverter))]
+        public ulong ProfileId { get; set; }
 
         [JsonPropertyName("gameSkillLevel")]
         public int Level { get; set; }

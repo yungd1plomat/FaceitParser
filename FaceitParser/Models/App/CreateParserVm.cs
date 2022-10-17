@@ -22,6 +22,11 @@ namespace FaceitParser.Models.App
         public int Delay { get; set; }
 
 
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Минимальная сумма инвентаря 0 $")]
+        public int MinPrice { get; set; }
+
+
         [RegularExpression(@"(\d{1,3}\.){3}\d{1,3}:(\d+):(.*?):(.*)", ErrorMessage = "Неверный формат прокси")]
         public string? Proxy { get; set; }
 

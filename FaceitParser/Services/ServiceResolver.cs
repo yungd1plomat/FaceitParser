@@ -28,9 +28,9 @@ namespace FaceitParser.Services
             return Services[user].Keys.Where(x => x.Name == name);
         }
 
-        public async Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, CancellationTokenSource source)
+        public async Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, int minPrice, CancellationTokenSource source)
         {
-            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, source.Token);
+            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, source.Token);
             await faceitService.Init();
             await faceitService.Start().ConfigureAwait(false);
             if (!Services.ContainsKey(user))
@@ -40,7 +40,7 @@ namespace FaceitParser.Services
             Services[user].Add(faceitService, source);
         }
 
-        public async Task Remove(string user, string name)
+        public void Remove(string user, string name)
         {
             if (!Services.ContainsKey(user))
             {
