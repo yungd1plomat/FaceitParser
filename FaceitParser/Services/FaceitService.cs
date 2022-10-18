@@ -72,8 +72,8 @@ namespace FaceitParser.Services
 
         public async Task Init()
         {
-            //_items = await _steamApi.GetItems(); Не забыть поменять
-            _items = await new SteamApi("qE4I4rd6hcjPl8CwYp4fW0Z4Lzc").GetItems();
+            _items = await _steamApi.GetItems();
+            /*_items = await new SteamApi("qE4I4rd6hcjPl8CwYp4fW0Z4Lzc").GetItems();*/
             Log($"Авторизованы как {faceitApi.SelfNick}");
             Log($"Получено {_items.Count()} предметов с маркета");
         }

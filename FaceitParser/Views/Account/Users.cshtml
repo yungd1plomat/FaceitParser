@@ -1,13 +1,14 @@
-﻿@using FaceitParser.Models
-@model BlacklistModel
+﻿@using FaceitParser.Models.App
+@model List<UserViewmodel>
+
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Blacklist | Faceit Parser</title>
+    <title>Users | Faceit Parser</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@sweetalert2/theme-dark@5/dark.css" />
     <link rel="stylesheet" href="~/css/sidebar.css" />
-    <link rel="stylesheet" href="~/css/blacklist.css" />
+    <link rel="stylesheet" href="~/css/users.css" />
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet" />
 </head>
 <div class="s-layout">
@@ -32,46 +33,50 @@
                     <a class="s-sidebar__nav-link" href="../blacklist"> <i class="fa fa-user-times"></i><em>Blacklist</em> </a>
                 </li>
 
-                @if (User.IsInRole("admin"))
-                {
-                    <li>
-                        <a class="s-sidebar__nav-link" href="../users"> <i class="fa fa-users"></i><em>Users</em> </a>
-                    </li>
-                }
+                <li>
+                    <a class="s-sidebar__nav-link" href="../users"> <i class="fa fa-users"></i><em>Users</em> </a>
+                </li>
             </ul>
         </nav>
     </div>
 
     <!-- Content -->
     <main class="s-layout__content">
-        <div class="blacklistTable">
-            <div class="searchBlock">
-                <input class="swal2-input searchInput" required>
-                <button for="searchInput" class="button search">Search</button>
+        <div class="usersTable">
+            <div class="text-danger">
+                @Html.ValidationSummary(false)
+            </div>
+            <div class="functional">
+                 <button class="button add">Add</button>
+                 <div class="searchBlock">
+                    <input class="swal2-input searchInput" required>
+                    <button for="searchInput" class="button search">Search</button>
+                 </div>
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Country</th>
-                        <th scope="col">Lvl</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Action</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @{
-                        if (Model is not null)
+                        foreach (var user in Model)
                         {
-                            foreach (var player in Model.Players)
-                            {
-                                    <tr>
-                                        <td data-th="Name" scope="row">@player.Nick</td>
-                                        <td data-th="Country">@player.Country</td>
-                                        <td data-th="Lvl">@player.Level</td>
-                                        <td data-th="Action"><a href="#" id="@player.ProfileId" onclick="Delete('@player.ProfileId');">Delete</a></td>
-                                    </tr>
-                            }
+                            <tr>
+                                <td data-th="Username" scope="row">@user.UserName</td>
+                                <td data-th="Role">@user.Role</td>
+                                <td data-th="Action">
+                                    <a href="#" id="@user.UserName" onclick="Edit('@user.UserName');">Edit</a>
+                                </td>
+                                <td data-th="Action">
+                                    <a href="#" id="@user.UserName" onclick="Delete('@user.UserName');">Delete</a>
+                                </td>
+                            </tr>
                         }
                     }
                 </tbody>
@@ -85,5 +90,5 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/blacklist.js"></script>
+    <script src="~/js/users.js"></script>
 </div>

@@ -1,0 +1,194 @@
+﻿html {
+    background: #121212;
+    width: 100%;
+}
+
+.usersTable {
+    position: absolute;
+    top: 2em;
+    margin: 0 10px 0 10px;
+    display: table;
+}
+
+    .usersTable a {
+        color: #6600ff;
+    }
+
+.pageNavigation {
+    padding: 10px;
+}
+
+.prev {
+    width: 5rem;
+    position: absolute;
+    left: 10px;
+    display: none;
+}
+
+.pageNum {
+    position: absolute;
+    margin-left: 50%;
+    color: #fff;
+    font-size: 20px;
+}
+
+.text-danger li {
+    color: red;
+    font-size: 13px;
+}
+
+.createForm {
+    display: grid;
+}
+
+    .createForm p {
+        display: grid;
+    }
+
+    .createForm span {
+        display: grid;
+    }
+
+.submitBtn {
+    width: 200px;
+    justify-self: center;
+}
+
+.next {
+    width: 5rem;
+    position: absolute;
+    right: 10px;
+}
+
+.searchBlock {
+    text-align: right;
+}
+
+.button {
+    border: 1px solid #c8354e;
+    background: #c8354e;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0 0 15px;
+    cursor: pointer;
+}
+
+    .button:active {
+        background: #ea4f6a;
+    }
+
+.body {
+    color: #fff;
+}
+
+.create a {
+    color: palevioletred;
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    color: #fff;
+    overflow: hidden;
+}
+
+tr:nth-child(even) {
+    background: #242424;
+}
+
+tr:nth-child(odd) {
+    background: #141414;
+}
+
+th, td {
+    padding: 1rem;
+}
+
+th {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: #fff;
+    background: #3b3771;
+}
+
+td {
+    word-wrap: break-word;
+}
+
+tr:hover td {
+    color: white;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.functional {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.add {
+    width: 5rem;
+}
+
+
+
+@media screen and (max-width: 639px) {
+    .usersTable {
+        top: 5em;
+    }
+
+    table {
+        border: 0;
+    }
+
+    thead {
+        display: none;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    tr {
+        display: block;
+        margin-bottom: 2rem;
+    }
+
+        tr:nth-child(even), tr:nth-child(odd) {
+            background: #242424;
+        }
+
+    td {
+        display: block;
+        padding: 0.75rem;
+        font-size: 13px;
+        text-align: right;
+        word-wrap: unset;
+        border-bottom: 1px solid #141414;
+    }
+
+        td:before {
+            content: attr(data-th);
+            float: left;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        td:last-child {
+            border-bottom: 0;
+        }
+}
+
+.searchInput {
+    margin: 10px;
+    height: 40px;
+}
+
+.swal2-show {
+    background: #17171a;
+}

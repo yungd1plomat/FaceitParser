@@ -31,7 +31,7 @@ namespace FaceitParser
             {
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = "/account/login";
-                options.AccessDeniedPath = "/error";
+                options.AccessDeniedPath = "/";
             });
             services.AddSingleton<ISteamApi, SteamApi>(api => new SteamApi(Configuration["SteamApiKey"]));
             services.AddSingleton<IServiceResolver, ServiceResolver>();
