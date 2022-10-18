@@ -17,7 +17,6 @@ namespace FaceitParser.Controllers
         }
 
         [Route("/")]
-        [Authorize]
         public IActionResult Index()
         {
             return View();

@@ -1,6 +1,9 @@
 ﻿using FaceitParser.Abstractions;
+using FaceitParser.Data;
 using FaceitParser.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Threading;
 
 namespace FaceitParser.Services
@@ -9,11 +12,15 @@ namespace FaceitParser.Services
     {
         private ISteamApi _steamApi { get; set; }
 
+        private IConfiguration _configuration { get; set; }
+
         public IDictionary<string, IDictionary<FaceitService, CancellationTokenSource>> Services { get; set; }
 
+        
 
-        public ServiceResolver(ISteamApi steamApi)
+        public ServiceResolver(ISteamApi steamApi, IConfiguration configuration)
         {
+            _configuration = configuration;
             _steamApi = steamApi;
             Services = new Dictionary<string, IDictionary<FaceitService, CancellationTokenSource>>();
         }
@@ -30,7 +37,10 @@ namespace FaceitParser.Services
 
         public async Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, int minPrice, CancellationTokenSource source)
         {
-            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, source.Token);
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseMySql(_configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 27)));
+            ApplicationDbContext db = new ApplicationDbContext(optionsBuilder.Options);
+            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, db, user, source.Token);
             await faceitService.Init();
             await faceitService.Start().ConfigureAwait(false);
             if (!Services.ContainsKey(user))

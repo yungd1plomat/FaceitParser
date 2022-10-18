@@ -1,4 +1,5 @@
 ﻿using FaceitParser.Abstractions;
+using FaceitParser.Data;
 using FaceitParser.Models;
 using System.Collections.Concurrent;
 using System.Text;
@@ -49,9 +50,13 @@ namespace FaceitParser.Services
 
         private double _minPrice { get; set; }
 
+        private ApplicationDbContext _context { get; set; }
 
-        public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, int minPrice, CancellationToken cancellationToken)
+        private string _userId { get; set; }
+
+        public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, int minPrice, ApplicationDbContext dbContext, string userId, CancellationToken cancellationToken)
         {
+            _userId = userId;
             _steamApi = steamApi;
             _location = location;
             _maxLevel = maxLvl;
@@ -62,6 +67,7 @@ namespace FaceitParser.Services
             Logs = new ConcurrentQueue<string>();
             _players = new ConcurrentQueue<Player>();
             _minPrice = minPrice;
+            _context = dbContext;
         }
 
         public async Task Init()
@@ -108,8 +114,11 @@ namespace FaceitParser.Services
                         var players = await faceitApi.GetPlayersAsync(initPlayers, _location.Countries, _location.IgnoreCountries);
                         if (!players.Any())
                             continue;
+                        var userBlacklist = _context.Blacklists.FirstOrDefault(x => x.UserId == _userId);
                         foreach (var player in players)
-                        {
+                        {   
+                            if (userBlacklist?.Players?.Any(x => x.ProfileId == player.ProfileId) ?? false)
+                                continue;
                             var price = await GetInventoryPrice(player);
                             if (price >= _minPrice)
                             {
@@ -117,6 +126,11 @@ namespace FaceitParser.Services
                                 //_players.Enqueue(player);
                             }
                         }
+                        if (userBlacklist is null)
+                            await _context.Blacklists.AddAsync(new BlacklistModel(_userId, players.ToList()));
+                        else
+                            userBlacklist.Players.AddRange(players);
+                        await _context.SaveChangesAsync(_cancellationToken);
                         Interlocked.Add(ref Parsed, players.Count());
                     }
                     offset += gameIds.Count();
@@ -163,10 +177,10 @@ namespace FaceitParser.Services
                         count++;
                     }
                     await faceitApi.AddFriendsAsync(chunkPlayers);
-                    foreach (var player in chunkPlayers)
+                    chunkPlayers.ForEach(player =>
                     {
                         Log($"Добавили {player.Nick}");
-                    }
+                    });
                 }
                 await Task.Delay(LOOP_DELAY);
             }
@@ -180,6 +194,7 @@ namespace FaceitParser.Services
 
         public void Dispose()
         {
+            _context.Dispose();
             faceitApi.Dispose();
         }
     }
