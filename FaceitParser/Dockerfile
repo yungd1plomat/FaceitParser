@@ -1,0 +1,22 @@
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 3810
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["FaceitParser/FaceitParser.csproj", "FaceitParser/"]
+RUN dotnet restore "FaceitParser/FaceitParser.csproj"
+COPY . .
+WORKDIR "/src/FaceitParser"
+RUN dotnet build "FaceitParser.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "FaceitParser.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS http://*:3810
+ENTRYPOINT ["dotnet", "FaceitParser.dll"]
