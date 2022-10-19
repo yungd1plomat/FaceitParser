@@ -9,14 +9,12 @@ namespace FaceitParser.Models
 
         public string UserId { get; set; }
 
-        public List<Player> Players { get; set; }
+        public string Nick { get; set; }
 
-        public BlacklistModel() { }
+        public int Level { get; set; }
 
-        public BlacklistModel(string userId, List<Player> players)
-        {
-            UserId = userId;
-            Players = players;
-        }
+        public string Country { get; set; }
+
+        public ulong ProfileId { get; set; }
     }
 }

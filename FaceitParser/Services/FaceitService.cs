@@ -12,7 +12,7 @@ namespace FaceitParser.Services
     {
         const int MAX_FACEIT_PLAYERS = 100;
 
-        const int MIN_FACEIT_PLAYERS = 30;
+        const int MIN_FACEIT_PLAYERS = 15;
 
         const int LOOP_DELAY = 1000;
 
@@ -54,6 +54,7 @@ namespace FaceitParser.Services
 
         private string _userId { get; set; }
 
+
         public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, int minPrice, ApplicationDbContext dbContext, string userId, CancellationToken cancellationToken)
         {
             _userId = userId;
@@ -73,7 +74,6 @@ namespace FaceitParser.Services
         public async Task Init()
         {
             _items = await _steamApi.GetItems();
-            /*_items = await new SteamApi("qE4I4rd6hcjPl8CwYp4fW0Z4Lzc").GetItems();*/
             Log($"Авторизованы как {faceitApi.SelfNick}");
             Log($"Получено {_items.Count()} предметов с маркета");
         }
@@ -83,8 +83,9 @@ namespace FaceitParser.Services
             Games = 0;
             Total = 0;
             Parsed = 0;
-            Task.Run(async () => await LoopGames());
-            Task.Run(async () => await LoopPlayers());
+            _players = new ConcurrentQueue<Player>();
+            new Thread(async () => await LoopGames()).Start();
+            new Thread(async () => await LoopPlayers()).Start();
         }
 
         public async Task LoopGames()
@@ -97,7 +98,8 @@ namespace FaceitParser.Services
                     var gameIds = await faceitApi.GetGameIdsAsync(_location.Region, offset);
                     if (!gameIds.Any()) {
                         offset = 0;
-                        Log("Начинаем парсинг с начала");
+                        Log("Игр не найдено, начинаем парсинг с начала");
+                        await Task.Delay(Delay);
                         continue;
                     }
                     await Task.Delay(Delay);
@@ -114,30 +116,45 @@ namespace FaceitParser.Services
                         var players = await faceitApi.GetPlayersAsync(initPlayers, _location.Countries, _location.IgnoreCountries);
                         if (!players.Any())
                             continue;
-                        var userBlacklist = _context.Blacklists.FirstOrDefault(x => x.UserId == _userId);
+                        var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
+                        ConcurrentQueue<BlacklistModel> newblacklist = new ConcurrentQueue<BlacklistModel>();
+                        List<Thread> threads = new List<Thread>();
                         foreach (var player in players)
-                        {   
-                            if (userBlacklist?.Players?.Any(x => x.ProfileId == player.ProfileId) ?? false)
-                                continue;
-                            var price = await GetInventoryPrice(player);
-                            if (price >= _minPrice)
+                        {
+                            var thread = new Thread(async () =>
                             {
-                                Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
-                                //_players.Enqueue(player);
-                            }
+                                if (userBlacklist?.Any(x => x.ProfileId == player.ProfileId) == true)
+                                    return;
+                                var price = await GetInventoryPrice(player).ConfigureAwait(false);
+                                if (price >= _minPrice)
+                                {
+                                    Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
+                                    _players.Enqueue(player);
+                                    Interlocked.Increment(ref Parsed);
+                                    newblacklist.Enqueue(new BlacklistModel()
+                                    {
+                                        Nick = player.Nick,
+                                        Country = player.Country,
+                                        ProfileId = player.ProfileId,
+                                        Level = player.Level,
+                                        UserId = _userId,
+                                    });
+                                }
+                            });
+                            threads.Add(thread);
+                            thread.Start();
                         }
-                        if (userBlacklist is null)
-                            await _context.Blacklists.AddAsync(new BlacklistModel(_userId, players.ToList()));
-                        else
-                            userBlacklist.Players.AddRange(players);
+                        foreach (var thread in threads)
+                            thread.Join();
+                        if (newblacklist.Any())
+                            await _context.Blacklists.AddRangeAsync(newblacklist.ToList());
                         await _context.SaveChangesAsync(_cancellationToken);
-                        Interlocked.Add(ref Parsed, players.Count());
                     }
                     offset += gameIds.Count();
                 } 
                 catch (Exception ex)
                 {
-                    Log(ex.Message);
+                    Log($"{ex.Message}:{ex.StackTrace}");
                 }
                 await Task.Delay(Delay);
             }
@@ -169,18 +186,25 @@ namespace FaceitParser.Services
             {
                 if (_players.Count > MIN_FACEIT_PLAYERS)
                 {
-                    List<Player> chunkPlayers = new List<Player>();
-                    int count = 0;
-                    while (count < MAX_FACEIT_PLAYERS && _players.TryDequeue(out Player result))
+                    try
                     {
-                        chunkPlayers.Add(result);
-                        count++;
+                        List<Player> chunkPlayers = new List<Player>();
+                        int count = 0;
+                        while (count < MAX_FACEIT_PLAYERS && _players.TryDequeue(out Player result))
+                        {
+                            chunkPlayers.Add(result);
+                            count++;
+                        }
+                        await faceitApi.AddFriendsAsync(chunkPlayers);
+                        chunkPlayers.ForEach(player =>
+                        {
+                            Log($"Добавили {player.Nick}");
+                        });
+                        Interlocked.Add(ref Added, chunkPlayers.Count());
+                    } catch (Exception ex)
+                    {
+                        Log($"{ex.Message}:{ex.StackTrace}");
                     }
-                    await faceitApi.AddFriendsAsync(chunkPlayers);
-                    chunkPlayers.ForEach(player =>
-                    {
-                        Log($"Добавили {player.Nick}");
-                    });
                 }
                 await Task.Delay(LOOP_DELAY);
             }

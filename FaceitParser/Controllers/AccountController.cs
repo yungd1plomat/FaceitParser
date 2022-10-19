@@ -62,12 +62,15 @@ namespace FaceitParser.Controllers
                 return BadRequest(ModelState);
             var user = new IdentityUser(model.Username);
             var result = await userManager.CreateAsync(user, model.Password);
-            var roleResult = await userManager.AddToRoleAsync(user, model.Role);
-            foreach (var error in result.Errors)
+            if (result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                var roleResult = await userManager.AddToRoleAsync(user, model.Role);
+                foreach (var error in roleResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
-            foreach (var error in roleResult.Errors)
+            foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
@@ -97,10 +100,10 @@ namespace FaceitParser.Controllers
                     await userManager.RemoveFromRoleAsync(user, role);
                 }
             }
-            var blacklist = await context.Blacklists.Include(x => x.Players).FirstOrDefaultAsync(x => x.UserId == user.Id);
-            if (blacklist is not null)
+            var blacklist = context.Blacklists.Where(x => x.UserId == user.Id);
+            if (blacklist is not null && blacklist.Any())
             {
-                context.Blacklists.Remove(blacklist);
+                context.Blacklists.RemoveRange(blacklist);
                 await context.SaveChangesAsync();
             }
             IdentityResult result = await userManager.DeleteAsync(user);

@@ -26,24 +26,22 @@ namespace FaceitParser.Controllers
         {
             search = search?.ToLower();
             var user = await _userManager.GetUserAsync(User);
-            var userBlacklist = _context.Blacklists.Include(x => x.Players).FirstOrDefault(x => x.UserId == user.Id);
-            if (userBlacklist is null)
+            var blacklist = _context.Blacklists.Where(x => x.UserId == user.Id).ToList();
+            if (blacklist is null)
                 return View();
-            var players = userBlacklist.Players;
             if (search is not null)
             {
-                players = players.Where(x => x.Nick.ToLower().Contains(search) ||
-                                             x.Level.ToString() == search ||
-                                             x.Country.ToLower() == search).ToList();
+                blacklist = blacklist.Where(x => x.Nick.ToLower().Contains(search) ||
+                                                 x.Level.ToString() == search ||
+                                                 x.Country.ToLower() == search).ToList();
             }
-            if (!players.Any())
+            if (!blacklist.Any())
                 return View();
-            players = players.OrderBy(x => x.Nick).ToList();
-            var chunked = players.Chunk(14).ToList();
+            blacklist = blacklist.OrderBy(x => x.Nick).ToList();
+            var chunked = blacklist.Chunk(14).ToList();
             if (page >= chunked.Count())
                 return RedirectToAction("Blacklist", "Blacklist", new { search = search });
-            userBlacklist.Players = chunked[page].ToList();
-            return View(userBlacklist);
+            return View(chunked[page].ToList());
         }
 
         // Принимаем string, т.к JS ебучий неправильно конвертирует числа
@@ -52,13 +50,11 @@ namespace FaceitParser.Controllers
         {
             var profileId = ulong.Parse(profile);
             var user = await _userManager.GetUserAsync(User);
-            var userBlacklist = _context.Blacklists.Include(x => x.Players).FirstOrDefault(x => x.UserId == user.Id);
-            if (userBlacklist is null)
-                return NotFound();
-            var player = userBlacklist.Players.FirstOrDefault(x => x.ProfileId.Equals(profileId));
+            var player = _context.Blacklists.FirstOrDefault(x => x.UserId == user.Id &&
+                                                                 x.ProfileId == profileId);
             if (player is null)
                 return NotFound();
-            userBlacklist.Players.Remove(player);
+            _context.Blacklists.Remove(player);
             await _context.SaveChangesAsync();
             return Ok(profileId);
         }

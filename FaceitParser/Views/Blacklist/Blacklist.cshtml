@@ -1,5 +1,5 @@
 ﻿@using FaceitParser.Models
-@model BlacklistModel
+@model List<BlacklistModel>
 
 <head>
     <meta charset="utf-8" />
@@ -61,9 +61,9 @@
 
                 <tbody>
                     @{
-                        if (Model is not null)
+                        if (Model.Any())
                         {
-                            foreach (var player in Model.Players)
+                            foreach (var player in Model)
                             {
                                     <tr>
                                         <td data-th="Name" scope="row">@player.Nick</td>
