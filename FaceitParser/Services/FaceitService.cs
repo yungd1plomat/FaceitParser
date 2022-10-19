@@ -117,7 +117,6 @@ namespace FaceitParser.Services
                         if (!players.Any())
                             continue;
                         var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
-                        ConcurrentQueue<BlacklistModel> newblacklist = new ConcurrentQueue<BlacklistModel>();
                         List<Thread> threads = new List<Thread>();
                         foreach (var player in players)
                         {
@@ -131,14 +130,15 @@ namespace FaceitParser.Services
                                     Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
                                     _players.Enqueue(player);
                                     Interlocked.Increment(ref Parsed);
-                                    newblacklist.Enqueue(new BlacklistModel()
+                                    var model = new BlacklistModel()
                                     {
                                         Nick = player.Nick,
                                         Country = player.Country,
                                         ProfileId = player.ProfileId,
                                         Level = player.Level,
                                         UserId = _userId,
-                                    });
+                                    };
+                                    await _context.Blacklists.AddAsync(model);
                                 }
                             });
                             threads.Add(thread);
@@ -146,8 +146,6 @@ namespace FaceitParser.Services
                         }
                         foreach (var thread in threads)
                             thread.Join();
-                        if (newblacklist.Any())
-                            await _context.Blacklists.AddRangeAsync(newblacklist.ToList());
                         await _context.SaveChangesAsync(_cancellationToken);
                     }
                     offset += gameIds.Count();
