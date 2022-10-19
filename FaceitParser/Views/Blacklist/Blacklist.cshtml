@@ -32,7 +32,7 @@
                     <a class="s-sidebar__nav-link" href="../blacklist"> <i class="fa fa-user-times"></i><em>Blacklist</em> </a>
                 </li>
 
-                @if (User.IsInRole("admin"))
+                @if (User?.IsInRole("admin") == true)
                 {
                     <li>
                         <a class="s-sidebar__nav-link" href="../users"> <i class="fa fa-users"></i><em>Users</em> </a>
@@ -61,7 +61,7 @@
 
                 <tbody>
                     @{
-                        if (Model.Any())
+                        if (Model is not null && Model.Any())
                         {
                             foreach (var player in Model)
                             {
