@@ -55,6 +55,7 @@ namespace FaceitParser
             app.UseExceptionHandler("/Home/Error");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
