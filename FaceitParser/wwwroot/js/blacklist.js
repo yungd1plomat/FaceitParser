@@ -28,6 +28,41 @@
             href += '&search=' + searchParams.get('search');
         location.href = href;
     });
+
+    $('.add').click(function() {
+        Swal.fire({
+            title: 'Select a file',
+            showCancelButton: true,
+            confirmButtonText: 'Upload',
+            input: 'file',
+            onBeforeOpen: () => {
+                $(".swal2-file").change(function () {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(this.files[0]);
+                });
+            }
+        }).then((file) => {
+            if (file.value) {
+                var formData = new FormData();
+                var file = $('.swal2-file')[0].files[0];
+                formData.append("fileToUpload", file);
+                $.ajax({
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    method: 'post',
+                    url: '../blacklist/upload',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (resp) {
+                        Swal('Uploaded', 'Your file have been uploaded', 'success');
+                    },
+                    error: function() {
+                        Swal({ type: 'error', title: 'Oops...', text: 'Something went wrong!' })
+                    }
+                })
+            }
+        })
+    })
 });
 
 function Delete(profile) {

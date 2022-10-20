@@ -1,4 +1,5 @@
 ﻿using FaceitParser.Data;
+using FaceitParser.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -49,12 +50,42 @@ namespace FaceitParser.Controllers
             var profileId = ulong.Parse(profile);
             var user = await _userManager.GetUserAsync(User);
             var player = _context.Blacklists.FirstOrDefault(x => x.UserId == user.Id &&
-                                                                 x.ProfileId == profileId);
+                                                                                        x.ProfileId == profileId);
             if (player is null)
                 return NotFound();
             _context.Blacklists.Remove(player);
             await _context.SaveChangesAsync();
             return Ok(profileId);
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> Add([FromForm] IFormFile file)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
+            string? fileContents = null;
+            using (var stream = file.OpenReadStream())
+            using (var reader = new StreamReader(stream))
+            {
+                fileContents = await reader.ReadToEndAsync();
+            }
+
+            if (fileContents is null)
+                return NotFound();
+            var lines = fileContents.Split(new char[] { '\n', '\t', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var profile in lines)
+            {
+                if (!ulong.TryParse(profile, out ulong profileId))
+                    continue;
+                _context.Blacklists.AddAsync(new BlacklistModel()
+                {
+                    UserId = user.Id,
+                    ProfileId = profileId,
+                });
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Blacklist");
         }
     }
 }

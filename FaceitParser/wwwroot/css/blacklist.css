@@ -3,6 +3,23 @@
     width: 100%;
 }
 
+.add {
+    width: 5rem;
+    border: 1px solid #c8354e;
+    background: #c8354e;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0 0 15px;
+    cursor: pointer;
+}
+
+.functional {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
 .blacklistTable {
     position: absolute;
     top: 2em;

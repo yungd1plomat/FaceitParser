@@ -45,31 +45,34 @@
     <!-- Content -->
     <main class="s-layout__content">
         <div class="blacklistTable">
-            <div class="searchBlock">
-                <input class="swal2-input searchInput" required>
-                <button for="searchInput" class="button search">Search</button>
+            <div class="functional">
+                <button class="add">Add</button>
+                <div class="searchBlock">
+                    <input class="swal2-input searchInput" required>
+                    <button for="searchInput" class="button search">Search</button>
+                </div>
             </div>
             <table>
                 <thead>
-                    <tr>
-                        <th scope="col">ProfileId</th>
-                        <th scope="col">Action</th>
-                    </tr>
+                <tr>
+                    <th scope="col">ProfileId</th>
+                    <th scope="col">Action</th>
+                </tr>
                 </thead>
 
                 <tbody>
-                    @{
-                        if (Model is not null && Model.Any())
+                @{
+                    if (Model is not null && Model.Any())
+                    {
+                        foreach (var player in Model)
                         {
-                            foreach (var player in Model)
-                            {
-                                    <tr>
-                                        <td data-th="ProfileId">@player.ProfileId</td>
-                                        <td data-th="Action"><a href="#" id="@player.ProfileId" onclick="Delete('@player.ProfileId');">Delete</a></td>
-                                    </tr>
-                            }
+                            <tr>
+                                <td data-th="ProfileId">@player.ProfileId</td>
+                                <td data-th="Action"><a href="#" id="@player.ProfileId" onclick="Delete('@player.ProfileId');">Delete</a></td>
+                            </tr>
                         }
                     }
+                }
                 </tbody>
             </table>
             <div class="pageNavigation">
