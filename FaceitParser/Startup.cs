@@ -19,7 +19,9 @@ namespace FaceitParser
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var connectionString = Configuration["CONNECTION_STRING"] ?? throw new InvalidOperationException("connection string not found");
+            var steamApiKey = Configuration["STEAM_API_KEY"] ?? throw new InvalidOperationException("steam api key not found");
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 27))));
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -39,7 +41,7 @@ namespace FaceitParser
                 options.LoginPath = "/account/login";
                 options.AccessDeniedPath = "/";
             });
-            services.AddSingleton<ISteamApi, SteamApi>(api => new SteamApi(Configuration["SteamApiKey"]));
+            services.AddSingleton<ISteamApi, SteamApi>(api => new SteamApi(steamApiKey));
             services.AddSingleton<IServiceResolver, ServiceResolver>();
             services.AddControllersWithViews();
         }

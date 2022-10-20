@@ -1,0 +1,2 @@
+CONNECTION_STRING="Server=localhost;Port=3306;Database=faceit;Uid=CHANGELOGIN;Pwd=CHANGEPASS;"
+STEAM_API_KEY="myapikey1234siqoeufjFJshwer"
