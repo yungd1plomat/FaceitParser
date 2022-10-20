@@ -52,9 +52,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Country</th>
-                        <th scope="col">Lvl</th>
+                        <th scope="col">ProfileId</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -66,9 +64,7 @@
                             foreach (var player in Model)
                             {
                                     <tr>
-                                        <td data-th="Name" scope="row">@player.Nick</td>
-                                        <td data-th="Country">@player.Country</td>
-                                        <td data-th="Lvl">@player.Level</td>
+                                        <td data-th="ProfileId">@player.ProfileId</td>
                                         <td data-th="Action"><a href="#" id="@player.ProfileId" onclick="Delete('@player.ProfileId');">Delete</a></td>
                                     </tr>
                             }

@@ -31,13 +31,11 @@ namespace FaceitParser.Controllers
                 return View();
             if (search is not null)
             {
-                blacklist = blacklist.Where(x => x.Nick.ToLower().Contains(search) ||
-                                                 x.Level.ToString() == search ||
-                                                 x.Country.ToLower() == search).ToList();
+                blacklist = blacklist.Where(x => x.ProfileId.ToString() == search).ToList();
             }
             if (!blacklist.Any())
                 return View();
-            blacklist = blacklist.OrderBy(x => x.Nick).ToList();
+            blacklist = blacklist.OrderBy(x => x.ProfileId).ToList();
             var chunked = blacklist.Chunk(14).ToList();
             if (page >= chunked.Count())
                 return RedirectToAction("Blacklist", "Blacklist", new { search = search });

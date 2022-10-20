@@ -132,10 +132,7 @@ namespace FaceitParser.Services
                                     Interlocked.Increment(ref Parsed);
                                     var model = new BlacklistModel()
                                     {
-                                        Nick = player.Nick,
-                                        Country = player.Country,
                                         ProfileId = player.ProfileId,
-                                        Level = player.Level,
                                         UserId = _userId,
                                     };
                                     await _context.Blacklists.AddAsync(model);
