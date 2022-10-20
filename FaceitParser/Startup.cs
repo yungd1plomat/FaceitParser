@@ -24,6 +24,12 @@ namespace FaceitParser
                 options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 27))));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                // enables immediate logout, after updating the user's security stamp.
+                options.ValidationInterval = TimeSpan.Zero;
+            });
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -38,10 +44,7 @@ namespace FaceitParser
             services.AddControllersWithViews();
         }
 
-        public void Configure(IApplicationBuilder app, 
-            IWebHostEnvironment env, 
-            UserManager<IdentityUser> userManager, 
-            RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -52,7 +55,6 @@ namespace FaceitParser
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseExceptionHandler("/Home/Error");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
@@ -64,6 +66,10 @@ namespace FaceitParser
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallback(async context =>
+                {
+                    context.Response.Redirect("/");
+                }); // Redirect not found maps to home page
             });
         }
 

@@ -59,13 +59,13 @@ namespace FaceitParser.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Add([FromForm] IFormFile file)
+        public async Task<IActionResult> Add([FromForm] IFormFile blacklist)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user is null)
                 return NotFound();
             string? fileContents = null;
-            using (var stream = file.OpenReadStream())
+            using (var stream = blacklist.OpenReadStream())
             using (var reader = new StreamReader(stream))
             {
                 fileContents = await reader.ReadToEndAsync();
@@ -74,18 +74,20 @@ namespace FaceitParser.Controllers
             if (fileContents is null)
                 return NotFound();
             var lines = fileContents.Split(new char[] { '\n', '\t', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var userBlacklist = _context.Blacklists.Where(x => x.UserId == user.Id).ToList();
             foreach (var profile in lines)
             {
-                if (!ulong.TryParse(profile, out ulong profileId))
+                if (!ulong.TryParse(profile, out ulong profileId) || 
+                    userBlacklist.Any(x => x.ProfileId == profileId))
                     continue;
-                _context.Blacklists.AddAsync(new BlacklistModel()
+                await _context.Blacklists.AddAsync(new BlacklistModel()
                 {
                     UserId = user.Id,
                     ProfileId = profileId,
                 });
             }
             await _context.SaveChangesAsync();
-            return RedirectToAction("Blacklist");
+            return Ok();
         }
     }
 }

@@ -26,9 +26,6 @@ namespace FaceitParser.Controllers
         [Route("/")]
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user is null)
-                await _singInManager.SignOutAsync();
             return View();
         }
     }

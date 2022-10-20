@@ -45,7 +45,7 @@
             if (file.value) {
                 var formData = new FormData();
                 var file = $('.swal2-file')[0].files[0];
-                formData.append("fileToUpload", file);
+                formData.append("blacklist", file);
                 $.ajax({
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     method: 'post',
@@ -54,10 +54,15 @@
                     processData: false,
                     contentType: false,
                     success: function (resp) {
-                        Swal('Uploaded', 'Your file have been uploaded', 'success');
+                        Swal.fire('Uploaded', 'Your file have been uploaded', 'success').then((result) => {
+                            window.location.reload();
+                        });
                     },
-                    error: function() {
-                        Swal({ type: 'error', title: 'Oops...', text: 'Something went wrong!' })
+                    error: function () {
+                        Swal({ type: 'error', title: 'Oops...', text: 'Something went wrong!' }).then((result) => {
+                            window.location.reload();
+                        });
+                        
                     }
                 })
             }
