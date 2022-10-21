@@ -194,16 +194,17 @@ namespace FaceitParser.Services
         {
             while (!_cancellationToken.IsCancellationRequested)
             {
+                if (!_players.TryDequeue(out Player player))
+                    continue;
                 try
                 {
-                    if (!_players.TryDequeue(out Player player))
-                        continue;
                     await FaceitApi.AddFriendsAsync(new Player[] { player });
                     Log($"Добавили {player.Nick}");
                     Interlocked.Increment(ref Added);
                 }
                 catch (Exception ex)
                 {
+                    _players.Enqueue(player);
                     Log(ex.Message);
                 }
                 await Task.Delay(LOOP_DELAY);
