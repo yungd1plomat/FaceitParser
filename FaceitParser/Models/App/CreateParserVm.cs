@@ -18,7 +18,7 @@ namespace FaceitParser.Models.App
         public int MaxLvl { get; set; }
 
         [Required]
-        [Range(350, int.MaxValue, ErrorMessage = $"Минимальная допустимая задержка 350 мс")]
+        [Range(1000, int.MaxValue, ErrorMessage = $"Минимальная допустимая задержка 1000 мс")]
         public int Delay { get; set; }
 
 

@@ -63,14 +63,16 @@ namespace FaceitParser.Controllers
             {
                 ModelState.AddModelError(string.Empty, $"Токен, прокси или тип прокси неверны ({ex.Message})");
             }
+            var user = await _userManager.GetUserAsync(User);
+            var services = _serviceResolver.Resolve(user.Id);
             var location = Constants.Locations.FirstOrDefault(x => x.Name == model.Location);
             if (location is null)
                 ModelState.AddModelError(string.Empty, $"Локация не найдена");
-            var user = await _userManager.GetUserAsync(User);
+            if (services.Any(x => x.Location.Name == model.Location))
+                ModelState.AddModelError(string.Empty, $"Парсер с такой локацией уже запущен");
             if (user is null)
                 ModelState.AddModelError(string.Empty, "Пользователь не найден");
-            var service = _serviceResolver.Resolve(user.Id, model.Name);
-            if (service.Any())
+            if (services.Any(x => x.Name == model.Name))
                 ModelState.AddModelError(string.Empty, "Парсер с таким названием уже существует");
             if (!ModelState.IsValid)
             {
@@ -101,7 +103,7 @@ namespace FaceitParser.Controllers
                 return RedirectToAction("Parser");
             GetParserViewmodel model = new GetParserViewmodel()
             {
-                Account = service.faceitApi.SelfNick,
+                Account = service.FaceitApi.SelfNick,
                 Added = service.Added,
                 Delay = service.Delay,
                 Games = service.Games,

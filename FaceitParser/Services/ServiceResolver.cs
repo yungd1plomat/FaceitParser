@@ -38,7 +38,7 @@ namespace FaceitParser.Services
         public async Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, int minPrice, CancellationTokenSource source)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseMySql(_configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 27)));
+            optionsBuilder.UseMySql(_configuration["CONNECTION_STRING"], new MySqlServerVersion(new Version(8, 0, 27)));
             ApplicationDbContext db = new ApplicationDbContext(optionsBuilder.Options);
             FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, db, user, source.Token);
             await faceitService.Init();

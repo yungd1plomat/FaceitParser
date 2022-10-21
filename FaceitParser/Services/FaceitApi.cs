@@ -88,7 +88,6 @@ namespace FaceitParser.Services
                                                                                   $"limit={limit}&" +
                                                                                   $"entityType=matchmaking&" +
                                                                                   $"offset={offset}", cancellationToken);
-            response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStreamAsync();
             var matches = await JsonSerializer.DeserializeAsync<Matches>(json);
@@ -146,7 +145,11 @@ namespace FaceitParser.Services
             if (selfId is null)
                 throw new Exception("Self Id empty, initialize it");
             var resp = await client.PostAsync($"{baseUrl}/friend-requests/v1/users/{selfId}/requests", content, cancellationToken);
-            resp.EnsureSuccessStatusCode();
+            if (!resp.IsSuccessStatusCode)
+            {
+                var response = await resp.Content.ReadAsStringAsync();
+                throw new Exception($"Не удалось добавить в друзья, ответ: {response}");
+            }
         }
 
 
