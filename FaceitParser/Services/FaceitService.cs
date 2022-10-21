@@ -3,6 +3,7 @@ using FaceitParser.Data;
 using FaceitParser.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Xml.Linq;
@@ -11,11 +12,7 @@ namespace FaceitParser.Services
 {
     public class FaceitService : IFaceitService, IDisposable
     {
-        const int MAX_FACEIT_PLAYERS = 100;
-
-        const int MIN_FACEIT_PLAYERS = 15;
-
-        const int LOOP_DELAY = 1000;
+        const int LOOP_DELAY = 7000;
 
 
         public string Name { get; set; }
@@ -197,27 +194,17 @@ namespace FaceitParser.Services
         {
             while (!_cancellationToken.IsCancellationRequested)
             {
-                if (_players.Count > MIN_FACEIT_PLAYERS)
+                try
                 {
-                    try
-                    {
-                        List<Player> chunkPlayers = new List<Player>();
-                        int count = 0;
-                        while (count < MAX_FACEIT_PLAYERS && _players.TryDequeue(out Player result))
-                        {
-                            chunkPlayers.Add(result);
-                            count++;
-                        }
-                        await FaceitApi.AddFriendsAsync(chunkPlayers);
-                        chunkPlayers.ForEach(player =>
-                        {
-                            Log($"Добавили {player.Nick}");
-                        });
-                        Interlocked.Add(ref Added, chunkPlayers.Count());
-                    } catch (Exception ex)
-                    {
-                        Log(ex.Message);
-                    }
+                    if (!_players.TryDequeue(out Player player))
+                        continue;
+                    await FaceitApi.AddFriendsAsync(new Player[] { player });
+                    Log($"Добавили {player.Nick}");
+                    Interlocked.Increment(ref Added);
+                }
+                catch (Exception ex)
+                {
+                    Log(ex.Message);
                 }
                 await Task.Delay(LOOP_DELAY);
             }
