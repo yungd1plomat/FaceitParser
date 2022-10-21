@@ -12,7 +12,7 @@ namespace FaceitParser.Services
 {
     public class FaceitService : IFaceitService, IDisposable
     {
-        const int LOOP_DELAY = 7000;
+        const int LOOP_DELAY = 4000;
 
 
         public string Name { get; set; }
