@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
+using Microsoft.VisualBasic;
 
 namespace FaceitParser.Controllers
 {
@@ -74,19 +76,25 @@ namespace FaceitParser.Controllers
             if (fileContents is null)
                 return NotFound();
             var lines = fileContents.Split(new char[] { '\n', '\t', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            var userBlacklist = _context.Blacklists.Where(x => x.UserId == user.Id).ToList();
-            foreach (var profile in lines)
+            
+            var profileIds = Array.ConvertAll(lines, s => ulong.TryParse(s, out ulong x) ? x : ulong.MinValue).Distinct().ToList();
+            profileIds.RemoveAll(x => x == ulong.MinValue);
+
+            var userBlacklist = _context.Blacklists.Where(x => x.UserId == user.Id)?.ToList();
+            var intersection = userBlacklist?.IntersectBy(profileIds, x => x.ProfileId)?.Select(x => x.ProfileId)?.ToList();
+            profileIds?.RemoveAll(x => intersection?.Any(y => y == x) is true); // Удаляем все дубли в загружаемом списке
+
+            var newBlacklist = profileIds?.Select(x => new BlacklistModel()
             {
-                if (!ulong.TryParse(profile, out ulong profileId) || 
-                    userBlacklist.Any(x => x.ProfileId == profileId))
-                    continue;
-                await _context.Blacklists.AddAsync(new BlacklistModel()
-                {
-                    UserId = user.Id,
-                    ProfileId = profileId,
-                });
+                UserId = user.Id,
+                ProfileId = x,
+            });
+            if (newBlacklist is not null &&
+                newBlacklist.Any())
+            {
+                await _context.Blacklists.AddRangeAsync(newBlacklist);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
             return Ok();
         }
     }

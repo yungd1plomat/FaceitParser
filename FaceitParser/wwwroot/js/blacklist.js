@@ -59,10 +59,9 @@
                         });
                     },
                     error: function () {
-                        Swal({ type: 'error', title: 'Oops...', text: 'Something went wrong!' }).then((result) => {
+                        Swal.fire({ type: 'error', title: 'Oops...', text: 'Something went wrong!' }).then((result) => {
                             window.location.reload();
                         });
-                        
                     }
                 })
             }
