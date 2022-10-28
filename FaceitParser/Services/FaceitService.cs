@@ -90,7 +90,7 @@ namespace FaceitParser.Services
 
         public async Task Init()
         {
-            _account = await _playersContext.Accounts.FirstAsync(x => x.Token == FaceitApi.Token);
+            _account = await _friendsContext.Accounts.FirstAsync(x => x.Token == FaceitApi.Token);
             _items = await _steamApi.GetItems();
             Log($"Авторизованы как {FaceitApi.SelfNick}");
             Log($"Получено {_items.Count()} предметов с маркета");
