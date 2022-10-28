@@ -17,6 +17,9 @@ namespace FaceitParser
                 var services = scope.ServiceProvider;
                 try
                 {
+                    var db = services.GetRequiredService<ApplicationDbContext>();
+                    await db.Database.MigrateAsync();
+
                     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                     await IdentityDataInitializer.SeedData(userManager, roleManager);

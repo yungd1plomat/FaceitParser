@@ -9,10 +9,12 @@ namespace FaceitParser.Data
     {
         public DbSet<BlacklistModel> Blacklists { get; set; }
 
+        public DbSet<FaceitAccount> Accounts { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+
         }
     }
 }
