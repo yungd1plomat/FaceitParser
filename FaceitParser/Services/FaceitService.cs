@@ -182,7 +182,7 @@ namespace FaceitParser.Services
             if (_players.Count >= QUEUE_LIMIT)
             {
                 // Получаем делей, при котором парсер дождется добавления в друзья всех игроков
-                int stopDelay = ((QUEUE_LIMIT * LOOP_DELAY) / DELAYS_COUNT) + INACCURACY;
+                int stopDelay = ((_players.Count * LOOP_DELAY) / DELAYS_COUNT) + INACCURACY;
                 Delay = stopDelay;
             }
         }
