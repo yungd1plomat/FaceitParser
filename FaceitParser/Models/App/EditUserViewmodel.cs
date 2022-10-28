@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FaceitParser.Models.App
+namespace FaceitParser.Models
 {
     public class EditUserViewmodel
     {

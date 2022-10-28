@@ -1,6 +1,5 @@
 ﻿using FaceitParser.Data;
 using FaceitParser.Models;
-using FaceitParser.Models.App;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FaceitParser.Controllers
 {
-    public class AccountController : Controller
+    [Route("[controller]")]
+    [Authorize(Roles = "admin")]
+    public class UsersController : Controller
     {
         private readonly UserManager<IdentityUser> userManager;
 
@@ -18,7 +19,7 @@ namespace FaceitParser.Controllers
 
         private readonly ApplicationDbContext context;
 
-        public AccountController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext dbContext)
+        public UsersController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext dbContext)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -26,7 +27,7 @@ namespace FaceitParser.Controllers
             this.context = dbContext;
         }
 
-        [HttpGet("[controller]/login")]
+        [HttpGet("login")]
         [AllowAnonymous]
         public IActionResult Login()
         {
@@ -35,8 +36,9 @@ namespace FaceitParser.Controllers
             return View(new LoginViewModel());
         }
 
-        [HttpPost("[controller]/login")]
+        [HttpPost("login")]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
@@ -46,7 +48,7 @@ namespace FaceitParser.Controllers
             return View(model);
         }
 
-        [HttpPost("[controller]/logout")]
+        [HttpPost("logout")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
@@ -54,8 +56,7 @@ namespace FaceitParser.Controllers
             return RedirectToAction("Login");
         }
 
-        [Authorize(Roles = "admin")]
-        [HttpPost("[controller]/create")]
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] CreateUserViewModel model)
         {
             if (!roleManager.Roles.Any(x => x.Name == model.Role))
@@ -74,11 +75,10 @@ namespace FaceitParser.Controllers
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-            return RedirectToAction("Users", "Account", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
+            return RedirectToAction("Users", "Users", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
         }
 
-        [HttpPost("[controller]/delete")]
-        [Authorize(Roles = "admin")]
+        [HttpPost("delete")]
         public async Task<IActionResult> Delete(string username)
         {
             var user = await userManager.FindByNameAsync(username);
@@ -112,8 +112,7 @@ namespace FaceitParser.Controllers
             return Ok(username);
         }
 
-        [HttpPost("[controller]/edit")]
-        [Authorize(Roles = "admin")]
+        [HttpPost("edit")]
         public async Task<IActionResult> Edit([FromForm] EditUserViewmodel viewmodel)
         {
             var user = await userManager.FindByNameAsync(viewmodel.OldUsername);
@@ -148,11 +147,10 @@ namespace FaceitParser.Controllers
                 }
             }
             await userManager.UpdateAsync(user);
-            return RedirectToAction("Users", "Account", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
+            return RedirectToAction("Users", "Users", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
         }
 
-        [Authorize(Roles = "admin")]
-        [HttpGet("users")]
+        [HttpGet()]
         public async Task<IActionResult> Users(string? search = null, int? page = 0, IEnumerable<string>? Errors = null)
         {
             if (Errors is not null)
@@ -177,7 +175,7 @@ namespace FaceitParser.Controllers
             }
             var chunked = vm.Chunk(14).ToList();
             if (page >= chunked.Count())
-                return RedirectToAction("Users", "Account");
+                return RedirectToAction("Users", "Users");
             return View(chunked[page ?? 0].ToList());
         }
 

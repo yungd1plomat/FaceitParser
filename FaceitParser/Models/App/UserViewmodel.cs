@@ -1,4 +1,4 @@
-﻿namespace FaceitParser.Models.App
+﻿namespace FaceitParser.Models
 {
     public class UserViewmodel
     {

@@ -39,8 +39,12 @@ namespace FaceitParser.Migrations
 
             modelBuilder.Entity("FaceitParser.Models.FaceitAccount", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("FriendRequests")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()

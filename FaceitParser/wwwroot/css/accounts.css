@@ -3,35 +3,14 @@
     width: 100%;
 }
 
-.btn {
-    width: 5rem;
-    border: 1px solid #c8354e;
-    background: #c8354e;
-    color: #ffffff;
-    font-weight: bold;
-    padding: 13px;
-    border-radius: 5px;
-    margin: 10px 10px 0 0;
-    cursor: pointer;
-}
-
-.btn:active {
-    background: #dd4962;
-}
-
-.functional {
-    display: grid;
-    grid-template-columns: auto auto;
-}
-
-.blacklistTable {
+.accountsTable {
     position: absolute;
     top: 2em;
     margin: 0 10px 0 10px;
     display: table;
 }
 
-    .blacklistTable a {
+    .accountsTable a {
         color: #6600ff;
     }
 
@@ -53,6 +32,28 @@
     font-size: 20px;
 }
 
+.text-danger li {
+    color: red;
+    font-size: 13px;
+}
+
+.createForm {
+    display: grid;
+}
+
+    .createForm p {
+        display: grid;
+    }
+
+    .createForm span {
+        display: grid;
+    }
+
+.submitBtn {
+    width: 200px;
+    justify-self: center;
+}
+
 .next {
     width: 5rem;
     position: absolute;
@@ -62,6 +63,7 @@
 .searchBlock {
     text-align: right;
 }
+
 .button {
     border: 1px solid #c8354e;
     background: #c8354e;
@@ -124,8 +126,19 @@ tr:hover td {
     background: rgba(0, 0, 0, 0.1);
 }
 
+.functional {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.add {
+    width: 5rem;
+}
+
+
+
 @media screen and (max-width: 639px) {
-    .blacklistTable {
+    .accountsTable {
         top: 5em;
     }
 

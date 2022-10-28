@@ -2,40 +2,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <title>Index | Faceit Parser</title>
-    <link rel="stylesheet" href="~/css/sidebar.css" />
     <link rel="stylesheet" href="~/css/index.css" />
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet" />
 </head>
 <div class="s-layout">
     <!-- Sidebar -->
-    <div class="s-layout__sidebar">
-        <a class="s-sidebar__trigger" href="#0">
-            <i class="fa fa-bars"></i>
-        </a>
-        <nav class="s-sidebar__nav">
-            <div class="menu-title">
-                <span>Faceit</span>
-                <span>Scanner</span>
-            </div>
-            <ul>
-                <li>
-                    <a class="s-sidebar__nav-link" href="/"> <i class="fa fa-home"></i><em>Home</em> </a>
-                </li>
-                <li>
-                    <a class="s-sidebar__nav-link" href="../parser"> <i class="fa fa-search"></i><em>Parser</em> </a>
-                </li>
-                <li>
-                    <a class="s-sidebar__nav-link" href="../blacklist"> <i class="fa fa-user-times"></i><em>Blacklist</em> </a>
-                </li>
-                @if (User.IsInRole("admin"))
-                {
-                    <li>
-                        <a class="s-sidebar__nav-link" href="../users"> <i class="fa fa-users"></i><em>Users</em> </a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    </div>
+    @await Html.PartialAsync("_Sidebar")
 
     <!-- Content -->
     <main class="s-layout__content">

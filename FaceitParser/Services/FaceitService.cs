@@ -1,7 +1,9 @@
 ﻿using FaceitParser.Abstractions;
 using FaceitParser.Data;
 using FaceitParser.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Numerics;
 using System.Text;
@@ -12,8 +14,15 @@ namespace FaceitParser.Services
 {
     public class FaceitService : IFaceitService, IDisposable
     {
+        public const int LIMIT = 50;
+
         const int LOOP_DELAY = 4000;
 
+        const int QUEUE_LIMIT = 10;
+
+        const int DELAYS_COUNT = 3;
+
+        const int INACCURACY = 2000;
 
         public string Name { get; set; }
 
@@ -42,7 +51,6 @@ namespace FaceitParser.Services
 
         private int _maxLevel { get; set; }
 
-
         private CancellationToken _cancellationToken { get; set; }
 
         private ConcurrentQueue<Player> _players { get; set; }
@@ -53,11 +61,14 @@ namespace FaceitParser.Services
 
         private string _userId { get; set; }
 
-        private Semaphore semaphore { get; set; }
+        private FaceitAccount _account { get; set; }
+
+        private bool _limited { get; set; }
+
+        private int _defaultDelay { get; set; }
 
         public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, int minPrice, ApplicationDbContext dbContext, string userId, CancellationToken cancellationToken)
         {
-            semaphore = new Semaphore(1, 1);
             _userId = userId;
             _steamApi = steamApi;
             Location = location;
@@ -70,10 +81,13 @@ namespace FaceitParser.Services
             _players = new ConcurrentQueue<Player>();
             _minPrice = minPrice;
             _context = dbContext;
+            _limited = false;
+            _defaultDelay = delay;
         }
 
         public async Task Init()
         {
+            _account = await _context.Accounts.FirstAsync(x => x.Token == FaceitApi.Token);
             _items = await _steamApi.GetItems();
             Log($"Авторизованы как {FaceitApi.SelfNick}");
             Log($"Получено {_items.Count()} предметов с маркета");
@@ -91,7 +105,7 @@ namespace FaceitParser.Services
         public async Task LoopGames()
         {
             int offset = 0;
-            while (!_cancellationToken.IsCancellationRequested)
+            while (!_cancellationToken.IsCancellationRequested && !_limited)
             {
                 try
                 {
@@ -105,60 +119,11 @@ namespace FaceitParser.Services
                     await Task.Delay(Delay);
                     foreach (var gameId in gameIds)
                     {
-                        if (_cancellationToken.IsCancellationRequested)
+                        if (_cancellationToken.IsCancellationRequested || _limited)
                             break;
+                        await ProcessGame(gameId);
                         Interlocked.Increment(ref Games);
-
-                        var initPlayers = await FaceitApi.GetPlayersAsync(gameId, _maxLevel);
-                        if (initPlayers is null || !initPlayers.Any())
-                        {
-                            await Task.Delay(Delay);
-                            continue;
-                        }
-                        Interlocked.Add(ref Total, initPlayers.Count());
                         await Task.Delay(Delay);
-
-                        var players = await FaceitApi.GetPlayersAsync(initPlayers, Location.Countries, Location.IgnoreCountries);
-                        if (players is null || !players.Any())
-                        {
-                            await Task.Delay(Delay);
-                            continue;
-                        }
-                        var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
-                        List<Thread> threads = new List<Thread>();
-                        foreach (var player in players)
-                        {
-                            if (_cancellationToken.IsCancellationRequested)
-                                break;
-                            var thread = new Thread(async () =>
-                            {
-                                if (userBlacklist?.Any(x => x.ProfileId == player.ProfileId) == true)
-                                    return;
-                                var price = await GetInventoryPrice(player).ConfigureAwait(false);
-                                if (price >= _minPrice)
-                                {
-                                    Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
-                                    _players.Enqueue(player);
-                                    Interlocked.Increment(ref Parsed);
-                                    var model = new BlacklistModel()
-                                    {
-                                        ProfileId = player.ProfileId,
-                                        UserId = _userId,
-                                    };
-                                    if (!_cancellationToken.IsCancellationRequested)
-                                    {
-                                        semaphore.WaitOne();
-                                        await _context.Blacklists.AddAsync(model);
-                                        semaphore.Release();
-                                    }
-                                }
-                            });
-                            threads.Add(thread);
-                            thread.Start();
-                        }
-                        foreach (var thread in threads)
-                            thread.Join();
-                        await _context.SaveChangesAsync(_cancellationToken);
                     }
                     offset += gameIds.Count();
                 } 
@@ -167,6 +132,55 @@ namespace FaceitParser.Services
                     Log($"{ex.Message}:{ex.StackTrace}");
                 }
                 await Task.Delay(Delay);
+            }
+        }
+
+        private async Task ProcessGame(string gameId)
+        {
+            var initPlayers = await FaceitApi.GetPlayersAsync(gameId, _maxLevel);
+            if (initPlayers is null || !initPlayers.Any()) 
+                return;
+            await Task.Delay(Delay);
+
+            var players = await FaceitApi.GetPlayersAsync(initPlayers, Location.Countries, Location.IgnoreCountries);
+            if (players is null || !players.Any())
+                return;
+
+            var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
+            List<Thread> threads = new List<Thread>();
+            foreach (var player in players)
+            {
+                if (_cancellationToken.IsCancellationRequested || _limited)
+                    break;
+                var thread = new Thread(async () =>
+                {
+                    if (userBlacklist?.Any(x => x.ProfileId == player.ProfileId) == true)
+                        return;
+                    var price = await GetInventoryPrice(player).ConfigureAwait(false);
+                    if (price >= _minPrice)
+                    {
+                        Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
+                        _players.Enqueue(player);
+                        Interlocked.Increment(ref Parsed);
+                    }
+                });
+                threads.Add(thread);
+                thread.Start();
+            }
+            foreach (var thread in threads)
+                thread.Join();
+            Interlocked.Add(ref Total, initPlayers.Count());
+        }
+
+        private void CalculateDelay()
+        {
+            if (_players.Count == 0)
+                Delay = _defaultDelay;
+            if (_players.Count >= QUEUE_LIMIT)
+            {
+                // Получаем делей, при котором парсер дождется добавления в друзья всех игроков
+                int stopDelay = ((QUEUE_LIMIT * LOOP_DELAY) / DELAYS_COUNT) + INACCURACY;
+                Delay = stopDelay;
             }
         }
 
@@ -187,19 +201,34 @@ namespace FaceitParser.Services
                     }
                 }
             } catch { }
-            return price;
+            return Math.Round(price, 3);
         }
 
         public async Task LoopPlayers()
         {
-            while (!_cancellationToken.IsCancellationRequested)
+            while (!_cancellationToken.IsCancellationRequested && !_limited)
             {
                 if (!_players.TryDequeue(out Player player))
                     continue;
+                CalculateDelay();
                 try
                 {
+                    if (_account.FriendRequests >= LIMIT)
+                    {
+                        _limited = true;
+                        Log($"Достигнут лимит друзей на аккаунте {_account.FriendRequests}/{LIMIT}");
+                        break;
+                    }
                     await FaceitApi.AddFriendsAsync(new Player[] { player });
                     Log($"Добавили {player.Nick}");
+                    var model = new BlacklistModel()
+                    {
+                        ProfileId = player.ProfileId,
+                        UserId = _userId,
+                    };
+                    await _context.Blacklists.AddAsync(model);
+                    _account.FriendRequests++;
+                    await _context.SaveChangesAsync(_cancellationToken);
                     Interlocked.Increment(ref Added);
                 }
                 catch (Exception ex)

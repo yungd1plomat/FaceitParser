@@ -6,11 +6,13 @@ namespace FaceitParser.Models
     public class FaceitAccount
     {
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
 
         public string Token { get; set; }
+
+        public int FriendRequests { get; set; }
 
         public string UserId { get; set; }
     }

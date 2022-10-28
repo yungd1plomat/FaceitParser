@@ -31,7 +31,7 @@
 
     $(".add").click(function () {
         Swal.fire({
-            html: '<form class="createForm" action="account/create" method="post">' +
+            html: '<form class="createForm" action="../users/create" method="post">' +
                 '<h1>Создать</h1>' +
                 '<br>' +
                 '<br>' +
@@ -67,7 +67,7 @@ function Delete(user) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            $.post("../account/delete", { username: user })
+            $.post("../users/delete", { username: user })
                 .done(function () {
                     $("#" + user).parent().parent().remove();
                     Swal.fire(
@@ -82,7 +82,7 @@ function Delete(user) {
 
 function Edit(user) {
     Swal.fire({
-        html: '<form class="createForm" action="account/edit" method="post">' +
+        html: '<form class="createForm" action="../users/edit" method="post">' +
             '<h1>Создать</h1>' +
             '<br>' +
             '<br>' +

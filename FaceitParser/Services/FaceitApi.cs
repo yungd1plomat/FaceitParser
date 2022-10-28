@@ -12,6 +12,8 @@ namespace FaceitParser.Services
     {
         public string SelfNick { get; set; }
 
+        public string Token { get; set; }
+
         private const string baseUrl = "https://api.faceit.com";
 
         private HttpClient client { get; set; }
@@ -23,6 +25,7 @@ namespace FaceitParser.Services
         public FaceitApi(string apiKey, CancellationToken cancellationToken, string proxy = null, string proxyType = null)
         {
             Init(apiKey, proxy, proxyType);
+            this.Token = apiKey;
             this.cancellationToken = cancellationToken;
         }
 
@@ -96,7 +99,7 @@ namespace FaceitParser.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Player>> GetPlayersAsync(string matchId, int maxLevel = 11)
+        public async Task<IEnumerable<Player>> GetPlayersAsync(string matchId, int maxLevel = 10)
         {
             var response = await client.GetAsync($"{baseUrl}/match/v2/match/{matchId}", cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -105,7 +108,7 @@ namespace FaceitParser.Services
             var matchInfo = await JsonSerializer.DeserializeAsync<MatchInfo>(json);
 
             var allPlayers = matchInfo?.Match?.Teams?.Faction1?.Players?.Concat(matchInfo?.Match?.Teams?.Faction2?.Players);
-            return allPlayers?.Where(x => x.Level < maxLevel);
+            return allPlayers?.Where(x => x.Level <= maxLevel);
         }
 
         /// <inheritdoc/>

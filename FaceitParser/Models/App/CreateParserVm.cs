@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FaceitParser.Models.App
+namespace FaceitParser.Models
 {
     public class CreateParserVm
     {
@@ -14,7 +14,7 @@ namespace FaceitParser.Models.App
         public string Location { get; set; }
 
         [Required]
-        [Range(2, 11, ErrorMessage = "Допустимый лвл 2-11")]
+        [Range(1, 10, ErrorMessage = "Допустимый лвл 1-10")]
         public int MaxLvl { get; set; }
 
         [Required]

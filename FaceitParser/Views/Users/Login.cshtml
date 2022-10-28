@@ -11,7 +11,7 @@
 <div class="flex-container">
         <div class="content-container">
         <div class="form-container">
-            <form asp-action="Login" asp-validation-summary="All" asp-controller="Account" asp-antiforgery="true" method="post">
+            <form asp-action="Login" asp-validation-summary="All" asp-controller="User" asp-antiforgery="true" method="post">
                 <h1>Login</h1>
                     <br>
                     <br>
@@ -25,6 +25,7 @@
                     <div class="text-danger"> 
                         @Html.ValidationSummary(false)
                     </div>
+                    @Html.AntiForgeryToken()
                     <br><br>
                     <input type="submit" value="SUBMIT" class="submit-btn">
                 </form>

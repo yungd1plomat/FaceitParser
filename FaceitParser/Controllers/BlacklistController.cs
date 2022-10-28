@@ -97,5 +97,18 @@ namespace FaceitParser.Controllers
             }
             return Ok();
         }
+
+        [HttpPost("clear")]
+        public async Task<IActionResult> Clear()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var blacklist = _context.Blacklists.Where(x => x.UserId == user.Id);
+            if (blacklist.Any())
+            {
+                _context.Blacklists.RemoveRange(blacklist);
+                await _context.SaveChangesAsync();
+            }
+            return Ok();
+        }
     }
 }

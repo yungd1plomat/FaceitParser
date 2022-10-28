@@ -1,6 +1,7 @@
 ﻿using FaceitParser.Abstractions;
+using FaceitParser.Data;
 using FaceitParser.Helpers;
-using FaceitParser.Models.App;
+using FaceitParser.Models;
 using FaceitParser.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,11 +21,14 @@ namespace FaceitParser.Controllers
 
         private readonly UserManager<IdentityUser> _userManager;
 
-        public ParserController(IServiceResolver serviceResolver, UserManager<IdentityUser> userManager, ILogger<HomeController> logger)
+        private readonly ApplicationDbContext _dbContext;
+
+        public ParserController(IServiceResolver serviceResolver, UserManager<IdentityUser> userManager, ApplicationDbContext dbContext, ILogger<HomeController> logger)
         {
             _logger = logger;
             _serviceResolver = serviceResolver; 
             _userManager = userManager;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
@@ -51,6 +55,8 @@ namespace FaceitParser.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] CreateParserVm model)
         {
+            if (!_dbContext.Accounts.Any(x => x.Token == model.Token))
+                ModelState.AddModelError(string.Empty, "Аккаунт не найден");
             if (!ModelState.IsValid)
                 return RedirectToAction("Parser", "Parser", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage)});
             CancellationTokenSource source = new CancellationTokenSource();
@@ -61,7 +67,7 @@ namespace FaceitParser.Controllers
             } 
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"Токен, прокси или тип прокси неверны ({ex.Message})");
+                ModelState.AddModelError(string.Empty, $"Аккаунт, прокси или тип прокси неверны ({ex.Message})");
             }
             var user = await _userManager.GetUserAsync(User);
             var services = _serviceResolver.Resolve(user.Id);

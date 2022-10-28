@@ -1,0 +1,40 @@
+﻿<head>
+    <link rel="stylesheet" href="~/css/sidebar.css" />
+</head>
+<div class="s-layout__sidebar">
+    <a class="s-sidebar__trigger" href="#0">
+        <i class="fa fa-bars"></i>
+    </a>
+    <nav class="s-sidebar__nav">
+        <div class="menu-title">
+            <span>Faceit</span>
+            <span>Scanner</span>
+        </div>
+        <ul>
+            <li>
+                <a class="s-sidebar__nav-link" href="/"> <i class="fa fa-home"></i><em>Home</em> </a>
+            </li>
+            <li>
+                <a class="s-sidebar__nav-link" href="../parser"> <i class="fa fa-search"></i><em>Parser</em> </a>
+            </li>
+            <li>
+                <a class="s-sidebar__nav-link" href="../blacklist"> <i class="fa fa-user-times"></i><em>Blacklist</em> </a>
+            </li>
+            <li>
+                <a class="s-sidebar__nav-link" href="../accounts"> <i class="fa fa-wheelchair"></i><em>Accounts</em> </a>
+            </li>
+            @if (User.IsInRole("admin"))
+            {
+                <li>
+                    <a class="s-sidebar__nav-link" href="../users"> <i class="fa fa-users"></i><em>Users</em> </a>
+                </li>
+            }
+            <li>
+                <a class="s-sidebar__nav-link" href="../users/logout" onclick="event.preventDefault();document.getElementById('magic-form').submit();"> <i class="fa fa-sign-out-alt"></i><em>Logout</em> </a>
+            </li>
+        </ul>
+    </nav>
+    <form id="magic-form" action="../users/logout" method="POST" style="display: none;">
+        @Html.AntiForgeryToken()
+    </form>
+</div>
