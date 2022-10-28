@@ -14,15 +14,15 @@ namespace FaceitParser.Services
 {
     public class FaceitService : IFaceitService, IDisposable
     {
-        public const int LIMIT = 50;
+        public const int LIMIT = 500;
 
         const int LOOP_DELAY = 4000;
 
-        const int QUEUE_LIMIT = 10;
+        const int QUEUE_LIMIT = 20;
 
         const int DELAYS_COUNT = 3;
 
-        const int INACCURACY = 2000;
+        const int INACCURACY = 3000;
 
         public string Name { get; set; }
 
