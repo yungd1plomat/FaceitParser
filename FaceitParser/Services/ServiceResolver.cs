@@ -39,8 +39,10 @@ namespace FaceitParser.Services
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseMySql(_configuration["CONNECTION_STRING"], new MySqlServerVersion(new Version(8, 0, 27)));
-            ApplicationDbContext db = new ApplicationDbContext(optionsBuilder.Options);
-            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, db, user, source.Token);
+            // Для использования в разных потоках (чтобы не было конфликтов)
+            var playersDb = new ApplicationDbContext(optionsBuilder.Options);
+            var friendsDb = new ApplicationDbContext(optionsBuilder.Options);
+            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, playersDb, friendsDb, user, source.Token);
             await faceitService.Init();
             await faceitService.Start().ConfigureAwait(false);
             if (!Services.ContainsKey(user))
