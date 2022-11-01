@@ -13,17 +13,21 @@
 Для этого поставьте docker на свою систему и настройке учетную запись.
 Далее перейдите в каталог с проектом (./FaceitParser) и соберите образ при помощи команды
 
-```docker build -t никучетки/faceitparser -f FaceitParser/Dockerfile . ```
+```bash
+docker build -t никучетки/faceitparser -f FaceitParser/Dockerfile . 
+```
 
 Далее запушим образ в dockerhub
 
-```docker push никучетки/faceitparser```
+```bash
+docker push никучетки/faceitparser
+```
 
 ## Установка и настройка Mysql
 
 ### Установка Mysql Server
 
-```
+```bash
 sudo apt update
 sudo apt install mysql-server
 ```
@@ -31,19 +35,19 @@ sudo apt install mysql-server
 ### Настройка Mysql 
 
 Подлючаемся к mysql командой
-```
+```bash
 sudo mysql
 ```
 
 Далее меняем метод аутентификации рута и пароль
-```
+```mysql
 ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'psswd';
 FLUSH PRIVILEGES;
 ```
 Где **'psswd'** ваш пароль
 
 Cоздаем нового пользователя, например я обычно создаю admin
-```
+```mysql
 CREATE USER 'admin'@'%' IDENTIFIED BY 'psswd';
 ```
 Где **'psswd'** ваш пароль.
@@ -51,12 +55,14 @@ CREATE USER 'admin'@'%' IDENTIFIED BY 'psswd';
 **Важно, всегда создаем пользователя с удаленным подключением, т.е после @ всегда идет %, а не localhost, иначе подключиться не получится**
 
 Даем права пользователю на свое бд (faceit в моем случае)
-```
+```mysql
 GRANT ALL PRIVILEGES ON faceit.* TO 'admin'@'%' WITH GRANT OPTION;
 ```
 
 Выходим командой 
-```exit```
+```bash
+exit
+```
 
 Разрешаем удаленные подключения, для этого открываем файл по пути
 ```
@@ -65,7 +71,7 @@ GRANT ALL PRIVILEGES ON faceit.* TO 'admin'@'%' WITH GRANT OPTION;
 
 Можете редачить его через любой ftp клиент.
 Я обычно редачу через nano командой
-```
+```bash
 sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 ```
 Перемещаемся при помощи стрелочек в консоли.
@@ -78,7 +84,7 @@ bind-address = 127.0.0.1
 Сохраняем, для этого нажимаем ctrl + s и дальше ctrl + x
 
 Перезапускаем Mysql 
-```
+```bash
 sudo systemctl restart mysql
 ```
 
@@ -90,7 +96,7 @@ sudo systemctl restart mysql
 
 ### Настройка перед установкой
 
-```
+```bash
 sudo apt-get update
 sudo apt-get install \
     ca-certificates \
@@ -106,13 +112,13 @@ echo \
 
 ### Установка docker engine
 
-```
+```bash
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
 Проверить правильно ли установлен Docker можете командой
-```
+```bash
 sudo docker run hello-world
 ```
 
@@ -120,7 +126,7 @@ sudo docker run hello-world
 
 ### Установка
 
-```
+```bash
 sudo apt-get install nginx
 sudo service nginx start
 ```
@@ -135,12 +141,12 @@ sudo service nginx start
 ```
 
 Я буду делать это опять таки при помощи nano
-```
+```bash
 sudo nano /etc/nginx/sites-available/default
 ```
 
 Все стираем и вставляем такое содержимое
-```
+```nginx
 server {
     listen        80;
     server_name   IP/DOMAIN NAME;
@@ -167,14 +173,14 @@ server {
 Если вы меняли дефолтный порт, то измение адрес http://localhost:3810 на адрес со своим портом.
 
 Проверим, валидная ли конфигурация командой
-```
+```bash
 sudo nginx -t
 ```
 
 Если выдало ошибку возвращайтесь к предыдущему шагу
 
 Перезапускаем nginx 
-```
+```bash
 sudo nginx -s reload
 ```
 
@@ -182,12 +188,12 @@ sudo nginx -s reload
 Юзаем Letencrypt сертификат, для настройки используем Certbot
 
 Устанавливаем
-```
+```bash
 sudo apt-get install python3-certbot-nginx
 ```
 
 Генерируем новый сертификат, для этого используем команду
-```
+```bash
 sudo certbot --nginx -d domain.com
 ```
 
@@ -230,7 +236,7 @@ STEAM_API_KEY=mysteamapikey123_fdsfdsfsdf-1234
 Закидываем данный файл на сервер, откуда будем запускать команду (дефолтная папка root)
 
 Подключаемся к серверу и пишем команду
-```
+```bash
 docker run --restart=always --env-file env.list -itd -p 3810:3810 yungd1plomat/faceitparser
 ```
 
