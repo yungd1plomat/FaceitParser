@@ -40,13 +40,13 @@ sudo mysql
 ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'psswd';
 FLUSH PRIVILEGES;
 ```
-Где 'psswd' ваш пароль
+Где **'psswd'** ваш пароль
 
 Cоздаем нового пользователя, например я обычно создаю admin
 ```
 CREATE USER 'admin'@'%' IDENTIFIED BY 'psswd';
 ```
-Где 'psswd' ваш пароль.
+Где **'psswd'** ваш пароль.
 
 **Важно, всегда создаем пользователя с удаленным подключением, т.е после @ всегда идет %, а не localhost, иначе подключиться не получится**
 
@@ -55,7 +55,8 @@ CREATE USER 'admin'@'%' IDENTIFIED BY 'psswd';
 GRANT ALL PRIVILEGES ON faceit.* TO 'admin'@'%' WITH GRANT OPTION;
 ```
 
-Выходим командой exit
+Выходим командой 
+```exit```
 
 Разрешаем удаленные подключения, для этого открываем файл по пути
 ```
@@ -190,7 +191,7 @@ sudo apt-get install python3-certbot-nginx
 sudo certbot --nginx -d domain.com
 ```
 
-Где domain.com - ваш домен.
+Где **domain.com** - ваш домен.
 
 В первом поле пишем email, который будет отображаться как контактная информация, можем вписать любую почту.
 
