@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace FaceitParser.Controllers
 {
@@ -150,6 +151,19 @@ namespace FaceitParser.Controllers
             return RedirectToAction("Users", "Users", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
         }
 
+        [HttpGet("dump/{username}")]
+        public async Task<IActionResult> Dump(string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            if (user is null)
+                return NotFound();
+            var blacklist = context.Blacklists.Where(x => x.UserId == user.Id).Select(x => x.ProfileId).ToList();
+            var content = Encoding.UTF8.GetBytes(string.Join("\n", blacklist));
+            var contentType = "text/plain";
+            var fileName = $"{username}.txt";
+            return File(content, contentType, fileName);
+        }
+
         [HttpGet()]
         public async Task<IActionResult> Users(string? search = null, int? page = 0, IEnumerable<string>? Errors = null)
         {
@@ -178,7 +192,5 @@ namespace FaceitParser.Controllers
                 return RedirectToAction("Users", "Users");
             return View(chunked[page ?? 0].ToList());
         }
-
-
     }
 }

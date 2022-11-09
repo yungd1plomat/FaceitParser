@@ -1,5 +1,6 @@
 ﻿using FaceitParser.Abstractions;
 using FaceitParser.Data;
+using FaceitParser.Helpers;
 using FaceitParser.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,11 +38,10 @@ namespace FaceitParser.Services
 
         public async Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, int minPrice, CancellationTokenSource source)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseMySql(_configuration["CONNECTION_STRING"], new MySqlServerVersion(new Version(8, 0, 27)));
             // Для использования в разных потоках (чтобы не было конфликтов)
-            var playersDb = new ApplicationDbContext(optionsBuilder.Options);
-            var friendsDb = new ApplicationDbContext(optionsBuilder.Options);
+            string connectionString = _configuration["CONNECTION_STRING"];
+            var playersDb = ContextFactory.CreateContext(connectionString);
+            var friendsDb = ContextFactory.CreateContext(connectionString);
             FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, minPrice, playersDb, friendsDb, user, source.Token);
             await faceitService.Init();
             await faceitService.Start().ConfigureAwait(false);

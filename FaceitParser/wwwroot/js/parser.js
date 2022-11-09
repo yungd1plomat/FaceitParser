@@ -26,13 +26,13 @@
                         '</select> ' +
                         '<p>' +
                         '<span class="subtitle">Максимальный лвл</span> ' +
-                        '<input name="MaxLvl" type="number" id="MaxLvl" class="swal2-input" required>' +
+                        '<input name="MaxLvl" type="number" min="1" max="10" id="MaxLvl" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Задержка (мс)</span> ' +
-                        '<input name="Delay" id="Delay" type="number" class="swal2-input" required>' +
+                        '<input name="Delay" id="Delay" type="number" min="1000" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Инвентарь от ($)</span> ' +
-                        '<input name="MinPrice" id="MinPrice" type="number" class="swal2-input" required>' +
+                        '<input name="MinPrice" id="MinPrice" type="number" min="0" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Прокси (ip:port:log:pass)</span> ' +
                         '<input name="Proxy" id="Proxy" class="swal2-input">' +

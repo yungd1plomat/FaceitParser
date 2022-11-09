@@ -34,6 +34,7 @@
                         <th scope="col">Role</th>
                         <th scope="col">Action</th>
                         <th scope="col">Action</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
 
@@ -46,6 +47,9 @@
                                 <td data-th="Role">@user.Role</td>
                                 <td data-th="Action">
                                     <a href="#" id="@user.UserName" onclick="Edit('@user.UserName');">Edit</a>
+                                </td>
+                                <td data-th="Action">
+                                    <a href="../users/dump/@user.UserName">Dump</a>
                                 </td>
                                 <td data-th="Action">
                                     <a href="#" id="@user.UserName" onclick="Delete('@user.UserName');">Delete</a>
