@@ -67,7 +67,10 @@ namespace FaceitParser.Services
 
         private bool _limited { get; set; }
 
+        private bool _needRestart { get; set; }
+
         private int _defaultDelay { get; set; }
+
 
         public FaceitService(ISteamApi steamApi, string name,  Location location, FaceitApi faceitapi, int delay, int maxLvl, int minPrice, ApplicationDbContext playersContext, ApplicationDbContext friendsContext, string userId, CancellationToken cancellationToken)
         {
@@ -85,6 +88,7 @@ namespace FaceitParser.Services
             _friendsContext = friendsContext;
             _playersContext = playersContext;
             _limited = false;
+            _needRestart = false;
             _defaultDelay = delay;
         }
 
@@ -108,7 +112,7 @@ namespace FaceitParser.Services
         public async Task LoopGames()
         {
             int offset = 0;
-            while (!_cancellationToken.IsCancellationRequested && !_limited)
+            while (!_cancellationToken.IsCancellationRequested && !_limited && !_needRestart)
             {
                 try
                 {
@@ -133,8 +137,18 @@ namespace FaceitParser.Services
                 catch (Exception ex)
                 {
                     Log($"{ex.Message}:{ex.StackTrace}");
+                    ProcessExceptions(ex);
                 }
                 await Task.Delay(Delay);
+            }
+        }
+
+        private void ProcessExceptions(Exception ex)
+        {
+            if (ex.Message.ToLower().Contains("cannot open when state is connecting"))
+            {
+                _needRestart = true;
+                Log($"Требуется перезапуск парсера..");
             }
         }
 
@@ -209,7 +223,7 @@ namespace FaceitParser.Services
 
         public async Task LoopPlayers()
         {
-            while (!_cancellationToken.IsCancellationRequested && !_limited)
+            while (!_cancellationToken.IsCancellationRequested && !_limited && !_needRestart)
             {
                 if (!_players.TryDequeue(out Player player))
                     continue;
