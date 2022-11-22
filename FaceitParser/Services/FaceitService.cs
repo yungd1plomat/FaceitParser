@@ -95,6 +95,10 @@ namespace FaceitParser.Services
             _limited = false;
             _needRestart = false;
             _defaultDelay = delay;
+            Added = new ConcurrentInt();
+            Games = new ConcurrentInt();
+            Total = new ConcurrentInt();
+            Parsed = new ConcurrentInt();
         }
 
         public async Task Init()

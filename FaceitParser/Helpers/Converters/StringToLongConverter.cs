@@ -17,11 +17,11 @@ namespace FaceitParser.Helpers
                     return number;
 
                 // try to parse from a string if the above failed, this covers cases with other escaped/UTF characters
-                if (ulong.TryParse(reader.GetString(), out number))
+                var str = reader.GetString()?.Replace("/", null);
+                if (ulong.TryParse(str, out number))
                     return number;
             }
 
-            // fallback to default handling
             return reader.GetUInt64();
         }
 
