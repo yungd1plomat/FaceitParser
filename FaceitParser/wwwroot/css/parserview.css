@@ -3,11 +3,23 @@
     width: 100%;
 }
 
+
+.steamTittle {
+    display: inline-grid;
+    grid-template-columns: 90% 10%;
+}
+
+.outputContainer {
+    display: inline-grid;
+    grid-template-columns: 50% 50%;
+    grid-column-gap: 10px;
+}
+
 .logsContainer {
     height: 660px;
-    padding: 10px;
     width: 100%;
     overflow-y: scroll;
+    scroll-behavior: smooth;
     background: rgb(28, 30, 31);
 }
 
@@ -15,6 +27,10 @@
     color: #fff;
     margin: 20px 0 0 20px;
     padding-top: 20px;
+}
+
+.steamIdContainer p {
+    padding-top: 2px;
 }
 
 .parserContent {
@@ -62,5 +78,13 @@
 
     .parserContent {
         top: 2em;
+    }
+
+    .logsContainer {
+        padding: 10px;
+    }
+
+    .outputContainer {
+        grid-template-columns: 70% 30%;
     }
 }

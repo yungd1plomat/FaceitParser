@@ -15,5 +15,7 @@
         public int Added { get; set; }
 
         public IEnumerable<string> Logs { get; set; }
+
+        public IEnumerable<ulong> SteamIds { get; set; }
     }
 }

@@ -41,7 +41,7 @@ namespace FaceitParser.Services
 
         public ConcurrentQueue<string> Logs { get; set; }
 
-        public ConcurrentQueue<string> SteamIds { get; set; }
+        public ConcurrentQueue<ulong> SteamIds { get; set; }
 
         public Location Location { get; set; }
 
@@ -88,6 +88,7 @@ namespace FaceitParser.Services
             Name = name;
             Delay = delay;
             Logs = new ConcurrentQueue<string>();
+            SteamIds = new ConcurrentQueue<ulong>();
             _players = new ConcurrentQueue<Player>();
             _minPrice = minPrice;
             _friendsContext = friendsContext;
@@ -183,6 +184,7 @@ namespace FaceitParser.Services
                     if (price >= _minPrice)
                     {
                         Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
+                        SteamIds.Enqueue(player.ProfileId);
                         _players.Enqueue(player);
                         Parsed.Increment();
                     }

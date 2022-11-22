@@ -8,6 +8,13 @@ $(document).ready(function () {
         .mouseleave(function (e) {
             dontScroll = false;
         });
+    $(".steamIdContainer")
+        .mouseenter(function (e) {
+            dontScroll = true;
+        })
+        .mouseleave(function (e) {
+            dontScroll = false;
+        });
 });
 
 function updateData() {
@@ -23,15 +30,21 @@ function updateData() {
             console.log(message);
             $('.logsContainer').append("<p>" + message + "</p>");
         });
+        var html = "";
+        $.each(data["steamIds"], function (index, steamid) {
+            console.log(steamid);
+            html += "<p>" + steamid + "</p>";
+        });
+        $('.steamIdContainer').html(html);
         Scroll();
     });
 }
 
 function Scroll() {
     if (!dontScroll) {
-        let scrollLenght = $('.logsContainer').children().length;
+        let logsLength = $('.logsContainer').children().length;
         $('.logsContainer').animate({
-            scrollTop: scrollLenght * 70
+            scrollTop: logsLength * 70
         }, 'slow');
     }
 }

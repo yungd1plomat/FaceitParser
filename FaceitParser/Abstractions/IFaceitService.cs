@@ -53,6 +53,11 @@ namespace FaceitParser.Abstractions
         ConcurrentQueue<string> Logs { get; }
 
         /// <summary>
+        /// Содержит спаршенные SteamId64
+        /// </summary>
+        ConcurrentQueue<ulong> SteamIds { get; set; }
+
+        /// <summary>
         /// Инициализирует новый инстанс сервиса
         /// </summary>
         Task Init();
