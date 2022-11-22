@@ -33,6 +33,8 @@ namespace FaceitParser.Controllers
                     ModelState.AddModelError(string.Empty, error);
             }
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
             search = search?.ToLower();
 
             var userAccounts = search is null ? _dbContext.Accounts.Where(x => x.UserId == user.Id).ToList() :
@@ -52,11 +54,13 @@ namespace FaceitParser.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromForm] string Token)
         {
-            if (_dbContext.Accounts.Any(x => x.Token == Token))
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
+            if (_dbContext.Accounts.Any(x => x.Token == Token && x.UserId == user.Id))
                 ModelState.AddModelError(string.Empty, "Такой аккаунт уже добавлен!");
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
                 using (FaceitApi api = new FaceitApi(Token, CancellationToken.None))
                 {
                     try
@@ -84,9 +88,12 @@ namespace FaceitParser.Controllers
         [HttpPost("delete")]
         public async Task<IActionResult> Delete(string Token)
         {
-            if (!_dbContext.Accounts.Any(x => x.Token == Token))
-                return BadRequest();
-            var account = _dbContext.Accounts.FirstOrDefault(x => x.Token == Token);
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
+            var account = _dbContext.Accounts.FirstOrDefault(x => x.Token == Token && x.UserId == user.Id);
+            if (account == default)
+                return NotFound(Token);
             _dbContext.Accounts.Remove(account);
             await _dbContext.SaveChangesAsync();
             return Ok(account.Name);
@@ -96,6 +103,8 @@ namespace FaceitParser.Controllers
         public async Task<Dictionary<string, string>?> Accounts()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return null;
             return await _dbContext.Accounts.Where(x => x.UserId == user.Id)?.ToDictionaryAsync(x => x.Name, x => x.Token);
         }
     }

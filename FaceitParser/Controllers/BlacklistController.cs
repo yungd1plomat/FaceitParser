@@ -29,6 +29,8 @@ namespace FaceitParser.Controllers
         {
             search = search?.ToLower();
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
             var blacklist = _context.Blacklists.Where(x => x.UserId == user.Id).ToList();
             if (blacklist is null)
                 return View();
@@ -68,9 +70,11 @@ namespace FaceitParser.Controllers
                 return NotFound();
             string? fileContents = null;
             using (var stream = blacklist.OpenReadStream())
-            using (var reader = new StreamReader(stream))
             {
-                fileContents = await reader.ReadToEndAsync();
+                using (var reader = new StreamReader(stream))
+                {
+                    fileContents = await reader.ReadToEndAsync();
+                }
             }
 
             if (fileContents is null)
@@ -102,6 +106,8 @@ namespace FaceitParser.Controllers
         public async Task<IActionResult> Clear()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
             var blacklist = _context.Blacklists.Where(x => x.UserId == user.Id);
             if (blacklist.Any())
             {

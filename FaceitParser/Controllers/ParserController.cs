@@ -70,6 +70,8 @@ namespace FaceitParser.Controllers
                 ModelState.AddModelError(string.Empty, $"Аккаунт, прокси или тип прокси неверны ({ex.Message})");
             }
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
             var services = _serviceResolver.Resolve(user.Id);
             var location = Constants.Locations.FirstOrDefault(x => x.Name == model.Location);
             if (location is null)
@@ -104,6 +106,8 @@ namespace FaceitParser.Controllers
         public async Task<IActionResult> GetData(string name)
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+                return NotFound();
             var service = _serviceResolver.Resolve(user.Id, name).FirstOrDefault();
             if (service == default)
                 return RedirectToAction("Parser");
