@@ -101,13 +101,18 @@ namespace FaceitParser.Controllers
                     await userManager.RemoveFromRoleAsync(user, role);
                 }
             }
-            var blacklist = context.Blacklists.Where(x => x.UserId == user.Id);
+            var blacklist = context.Blacklists.Where(x => x.UserId == user.Id).ToList();
             if (blacklist is not null && blacklist.Any())
             {
                 context.Blacklists.RemoveRange(blacklist);
-                await context.SaveChangesAsync();
+            }
+            var accounts = context.Accounts.Where(x => x.UserId == user.Id).ToList();
+            if (accounts is not null && accounts.Any())
+            {
+                context.Accounts.RemoveRange(accounts);
             }
             IdentityResult result = await userManager.DeleteAsync(user);
+            await context.SaveChangesAsync();
             if (!result.Succeeded)
                 return NotFound();
             return Ok(username);
