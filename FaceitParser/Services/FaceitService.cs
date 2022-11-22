@@ -15,7 +15,7 @@ namespace FaceitParser.Services
 {
     public class FaceitService : IFaceitService, IDisposable
     {
-        public const int LIMIT = 500;
+        public const int LIMIT = 1000;
 
         const int LOOP_DELAY = 4000;
 
