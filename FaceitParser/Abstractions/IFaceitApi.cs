@@ -9,6 +9,16 @@ namespace FaceitParser.Abstractions
     public interface IFaceitApi
     {
         /// <summary>
+        /// Ник авторизованного пользователя
+        /// </summary>
+        string SelfNick { get; }
+
+        /// <summary>
+        /// Токен авторизованного пользователя
+        /// </summary>
+        string Token { get; }
+
+        /// <summary>
         /// Инициализирует API клиент с заданным API ключом
         /// и при желании прокси
         /// </summary>

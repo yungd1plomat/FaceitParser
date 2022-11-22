@@ -14,7 +14,7 @@ namespace FaceitParser.Abstractions
         /// <returns>
         /// Массив из сервисов FaceitService для указанного пользователя
         /// </returns>
-        IEnumerable<FaceitService> Resolve(string user, string name = null);
+        IEnumerable<IFaceitService> Resolve(string user, string name = null);
 
         /// <summary>
         /// Создает и добавляет новый инстанс фейсит парсера в пул

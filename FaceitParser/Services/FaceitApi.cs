@@ -14,6 +14,7 @@ namespace FaceitParser.Services
 
         public string Token { get; set; }
 
+
         private const string baseUrl = "https://api.faceit.com";
 
         private HttpClient client { get; set; }

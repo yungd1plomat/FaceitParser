@@ -15,7 +15,7 @@ namespace FaceitParser.Services
 
         private IConfiguration _configuration { get; set; }
 
-        public IDictionary<string, IDictionary<FaceitService, CancellationTokenSource>> Services { get; set; }
+        public IDictionary<string, IDictionary<IFaceitService, CancellationTokenSource>> Services { get; set; }
 
         
 
@@ -23,11 +23,11 @@ namespace FaceitParser.Services
         {
             _configuration = configuration;
             _steamApi = steamApi;
-            Services = new Dictionary<string, IDictionary<FaceitService, CancellationTokenSource>>();
+            Services = new Dictionary<string, IDictionary<IFaceitService, CancellationTokenSource>>();
         }
 
 
-        public IEnumerable<FaceitService> Resolve(string user, string name = null)
+        public IEnumerable<IFaceitService> Resolve(string user, string name = null)
         {
             if (!Services.ContainsKey(user))
                 return Array.Empty<FaceitService>();
@@ -47,7 +47,7 @@ namespace FaceitParser.Services
             await faceitService.Start().ConfigureAwait(false);
             if (!Services.ContainsKey(user))
             {
-                Services.Add(user, new Dictionary<FaceitService, CancellationTokenSource>());
+                Services.Add(user, new Dictionary<IFaceitService, CancellationTokenSource>());
             }
             Services[user].Add(faceitService, source);
         }
@@ -61,8 +61,10 @@ namespace FaceitParser.Services
             var service = Services[user].FirstOrDefault(x => x.Key.Name == name);
             if (service.Key == null || service.Value == null)
                 return;
-            service.Value.Cancel();
-            service.Key.Dispose();
+            var cancelToken = service.Value;
+            var parser = service.Key as FaceitService;
+            cancelToken.Cancel();
+            parser.Dispose();
             Services[user].Remove(service);
         }
 

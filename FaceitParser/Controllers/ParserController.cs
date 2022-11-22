@@ -113,12 +113,12 @@ namespace FaceitParser.Controllers
                 return RedirectToAction("Parser");
             GetParserViewmodel model = new GetParserViewmodel()
             {
-                Account = service.FaceitApi.SelfNick,
-                Added = service.Added,
+                Account = service.AccountNick,
+                Added = service.Added.value,
                 Delay = service.Delay,
-                Games = service.Games,
-                Parsed = service.Parsed,
-                Total = service.Total,
+                Games = service.Games.value,
+                Parsed = service.Parsed.value,
+                Total = service.Total.value,
                 Logs = service.Logs.DequeueAll(),
             };
             return Ok(model);
