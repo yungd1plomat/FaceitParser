@@ -134,7 +134,7 @@ namespace FaceitParser.Services
             {
                 try
                 {
-                    var gameIds = await _faceitApi.GetGameIdsAsync(Location.Region, offset);
+                    var gameIds = await _faceitApi.GetGameIdsAsync(Location.RegionId, offset);
                     if (gameIds is null || !gameIds.Any()) {
                         offset = 0;
                         Log("Игр не найдено, начинаем парсинг с начала");

@@ -77,21 +77,13 @@ namespace FaceitParser.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<string>> GetGameIdsAsync(string region, int offset = 0, int limit = 100)
+        public async Task<IEnumerable<string>> GetGameIdsAsync(string regionId, int offset = 0, int limit = 100)
         {
-            var response = await client.GetAsync($"{baseUrl}/match/v1/matches/list?game=csgo&" +
-                                                                                  $"region={region}&" +
-                                                                                  $"state=SUBSTITUTION&" +
-                                                                                  $"state=CAPTAIN_PICK&" +
-                                                                                  $"state=VOTING&" +
-                                                                                  $"state=CONFIGURING&" +
-                                                                                  $"state=READY&" +
-                                                                                  $"state=ONGOING&" +
-                                                                                  $"state=MANUAL_RESULT&" +
-                                                                                  $"state=PAUSED&state=ABORTED&" +
-                                                                                  $"limit={limit}&" +
-                                                                                  $"entityType=matchmaking&" +
-                                                                                  $"offset={offset}", cancellationToken);
+            var response = await client.GetAsync($"{baseUrl}/match/v2/match?entityType=matchmaking&" +
+                                                                          $"entityId={regionId}&" +
+                                                                          $"state=SUBSTITUTION,CAPTAIN_PICK,VOTING,CONFIGURING,READY,ONGOING,MANUAL_RESULT,PAUSED,ABORTED&" +
+                                                                          $"limit={limit}&" +
+                                                                          $"offset={offset}", cancellationToken);
 
             var json = await response.Content.ReadAsStreamAsync();
             var matches = await JsonSerializer.DeserializeAsync<Matches>(json);

@@ -36,7 +36,7 @@ namespace FaceitParser.Abstractions
         /// <returns>
         /// Id матчей идущих в лайве
         /// </returns>
-        Task<IEnumerable<string>> GetGameIdsAsync(string region, int offset = 0, int limit = 100);
+        Task<IEnumerable<string>> GetGameIdsAsync(string regionId, int offset = 0, int limit = 100);
 
         /// <summary>
         /// Получает всех игроков указанного матча, 
