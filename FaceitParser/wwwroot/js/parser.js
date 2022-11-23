@@ -21,7 +21,12 @@
                         '<span class="subtitle">Локация</span> ' +
                         '<select name="Location" class="swal2-select inline-flex" id="Location" required>' +
                         '<option value="EU">EU</option>' +
+                        '<option value="EU prem">EU prem</option>' +
                         '<option value="RU (sng)">RU (sng)</option>' +
+                        '<option value="RU (sng) prem">RU (sng) prem</option>' +
+                        '<option value="SEA">SEA</option>' +
+                        '<option value="US">US</option>' +
+                        '<option value="SA">SA</option>' +
                         '<option value="Oceania">Oceania</option>' +
                         '</select> ' +
                         '<p>' +
