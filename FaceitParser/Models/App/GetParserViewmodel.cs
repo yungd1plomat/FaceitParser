@@ -16,6 +16,6 @@
 
         public IEnumerable<string> Logs { get; set; }
 
-        public IEnumerable<ulong> SteamIds { get; set; }
+        public IEnumerable<string> SteamIds { get; set; }
     }
 }

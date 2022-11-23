@@ -121,7 +121,7 @@ namespace FaceitParser.Controllers
                 Parsed = service.Parsed.value,
                 Total = service.Total.value,
                 Logs = service.Logs.DequeueAll(),
-                SteamIds = service.SteamIds,
+                SteamIds = service.SteamIds.Select(x => x.ToString()).ToList(),
             };
             return Ok(model);
         }
