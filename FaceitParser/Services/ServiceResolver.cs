@@ -41,9 +41,8 @@ namespace FaceitParser.Services
         {
             // Для использования в разных потоках (чтобы не было конфликтов)
             string connectionString = _configuration["CONNECTION_STRING"];
-            var playersDb = ContextFactory.CreateContext(connectionString);
-            var friendsDb = ContextFactory.CreateContext(connectionString);
-            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, maxMatches, minPrice, autoAdd, playersDb, friendsDb, user, source.Token);
+            var context = ContextFactory.CreateContext(connectionString);
+            FaceitService faceitService = new FaceitService(_steamApi, name, location, faceitApi, delay, maxLvl, maxMatches, minPrice, autoAdd, context, user, source.Token);
             await faceitService.Init();
             await faceitService.Start().ConfigureAwait(false);
             if (!Services.ContainsKey(user))

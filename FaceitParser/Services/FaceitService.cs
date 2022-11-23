@@ -72,9 +72,7 @@ namespace FaceitParser.Services
 
         private ConcurrentQueue<Player> _players { get; set; }
 
-        private ApplicationDbContext _playersContext { get; set; }
-
-        private ApplicationDbContext _friendsContext { get; set; }
+        private ApplicationDbContext _context { get; set; }
 
 
         private FaceitAccount _account { get; set; }
@@ -87,7 +85,7 @@ namespace FaceitParser.Services
         private int _defaultDelay { get; set; }
 
 
-        public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int maxMatches, int minPrice, bool autoAdd, ApplicationDbContext playersContext, ApplicationDbContext friendsContext, string userId, CancellationToken cancellationToken)
+        public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int maxMatches, int minPrice, bool autoAdd, ApplicationDbContext context, string userId, CancellationToken cancellationToken)
         {
             _userId = userId;
             _steamApi = steamApi;
@@ -103,8 +101,7 @@ namespace FaceitParser.Services
             SteamIds = new ConcurrentQueue<ulong>();
             _players = new ConcurrentQueue<Player>();
             _minPrice = minPrice;
-            _friendsContext = friendsContext;
-            _playersContext = playersContext;
+            _context = context;
             _limited = false;
             _needRestart = false;
             _defaultDelay = delay;
@@ -116,7 +113,7 @@ namespace FaceitParser.Services
 
         public async Task Init()
         {
-            _account = await _friendsContext.Accounts.FirstAsync(x => x.Token == _faceitApi.Token);
+            _account = await _context.Accounts.FirstAsync(x => x.Token == _faceitApi.Token);
             _items = await _steamApi.GetItems();
             Log($"Авторизованы как {_faceitApi.SelfNick}");
             Log($"Получено {_items.Count()} предметов с маркета");
@@ -188,7 +185,7 @@ namespace FaceitParser.Services
                 players = await _faceitApi.GetPlayersAsync(players, gameId, _maxMatches);
             }
 
-            var userBlacklist = _playersContext.Blacklists.Where(x => x.UserId == _userId).ToList();
+            var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
             List<Thread> threads = new List<Thread>();
             foreach (var player in players)
             {
@@ -213,6 +210,14 @@ namespace FaceitParser.Services
             }
             foreach (var thread in threads)
                 thread.Join();
+            var blacklist = players.Select(x => new BlacklistModel()
+            {
+                ProfileId = x.ProfileId,
+                UserId = _userId,
+            });
+            if (blacklist.Any())
+                _context.Blacklists.AddRange(blacklist);
+            await _context.SaveChangesAsync(_cancellationToken);
             Total.Add(initPlayers.Count());
         }
 
@@ -270,9 +275,7 @@ namespace FaceitParser.Services
                         ProfileId = player.ProfileId,
                         UserId = _userId,
                     };
-                    await _friendsContext.Blacklists.AddAsync(model);
                     _account.FriendRequests++;
-                    await _friendsContext.SaveChangesAsync(_cancellationToken);
                     Added.Increment();
                 }
                 catch (Exception ex)
@@ -297,8 +300,7 @@ namespace FaceitParser.Services
             Logs.Clear();
             _players.Clear();
             _items.Clear();
-            _friendsContext.Dispose();
-            _playersContext.Dispose();
+            _context.Dispose();
         }
     }
 }
