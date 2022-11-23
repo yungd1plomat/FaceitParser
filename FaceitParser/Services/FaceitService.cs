@@ -54,21 +54,27 @@ namespace FaceitParser.Services
 
         private ISteamApi _steamApi { get; set; }
 
+
         private int _maxLevel { get; set; }
+
+        private double _minPrice { get; set; }
+
+        private int _maxMatches { get; set; }
+
+        private string _userId { get; set; }
+
 
         private CancellationToken _cancellationToken { get; set; }
 
         private ConcurrentQueue<Player> _players { get; set; }
 
-        private double _minPrice { get; set; }
-
         private ApplicationDbContext _playersContext { get; set; }
 
         private ApplicationDbContext _friendsContext { get; set; }
 
-        private string _userId { get; set; }
 
         private FaceitAccount _account { get; set; }
+
 
         private bool _limited { get; set; }
 
@@ -77,12 +83,13 @@ namespace FaceitParser.Services
         private int _defaultDelay { get; set; }
 
 
-        public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int minPrice, ApplicationDbContext playersContext, ApplicationDbContext friendsContext, string userId, CancellationToken cancellationToken)
+        public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int maxMatches, int minPrice, ApplicationDbContext playersContext, ApplicationDbContext friendsContext, string userId, CancellationToken cancellationToken)
         {
             _userId = userId;
             _steamApi = steamApi;
             Location = location;
             _maxLevel = maxLvl;
+            _maxMatches = maxMatches;
             _cancellationToken = cancellationToken;
             _faceitApi = faceitapi;
             Name = name;

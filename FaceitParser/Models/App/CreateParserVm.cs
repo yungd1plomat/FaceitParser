@@ -4,6 +4,7 @@ namespace FaceitParser.Models
 {
     public class CreateParserVm
     {
+        [RegularExpression("[A-Za-z0-9]+", ErrorMessage = "Название парсера должно состоять из латинских букв и цифр")]
         [Required]
         public string Name { get; set; }
 
@@ -25,6 +26,11 @@ namespace FaceitParser.Models
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Минимальная сумма инвентаря 0 $")]
         public int MinPrice { get; set; }
+
+
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Минимальное значение для максимального количество матчей 0")]
+        public int MaxMatches { get; set; }
 
 
         [RegularExpression(@"(\d{1,3}\.){3}\d{1,3}:(\d+):(.*?):(.*)", ErrorMessage = "Неверный формат прокси")]

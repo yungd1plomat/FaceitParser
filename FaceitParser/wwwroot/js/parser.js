@@ -26,16 +26,19 @@
                         '</select> ' +
                         '<p>' +
                         '<span class="subtitle">Максимальный лвл</span> ' +
-                        '<input name="MaxLvl" type="number" min="1" max="10" id="MaxLvl" class="swal2-input" required>' +
+                        '<input name="MaxLvl" placeholder="10" type="number" min="1" max="10" id="MaxLvl" class="swal2-input" required>' +
+                        '<p>' +
+                        '<span class="subtitle">Максимально матчей</span> ' +
+                        '<input name="MaxMatches" placeholder="1000000" id="MaxMatches" type="number" min="0" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Задержка (мс)</span> ' +
-                        '<input name="Delay" id="Delay" type="number" min="1000" class="swal2-input" required>' +
+                        '<input name="Delay" id="Delay" placeholder="2000" type="number" min="1000" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Инвентарь от ($)</span> ' +
-                        '<input name="MinPrice" id="MinPrice" type="number" min="0" class="swal2-input" required>' +
+                        '<input name="MinPrice" id="MinPrice" placeholder="100" type="number" min="0" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Прокси (ip:port:log:pass)</span> ' +
-                        '<input name="Proxy" id="Proxy" class="swal2-input">' +
+                        '<input name="Proxy" placeholder="41.5.151.88:5501:d1plomat:password1234" id="Proxy" class="swal2-input">' +
                         '<p>' +
                         '<span class="subtitle">Тип прокси</span> ' +
                         '<select name="ProxyType" class="swal2-select inline-flex" id="ProxyType">' +
