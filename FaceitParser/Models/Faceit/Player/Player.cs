@@ -1,7 +1,7 @@
 ﻿using FaceitParser.Helpers;
 using System.Text.Json.Serialization;
 
-namespace FaceitParser.Models
+namespace FaceitParser.Models.Faceit
 {
     public class Player
     {

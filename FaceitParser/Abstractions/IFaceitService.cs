@@ -1,5 +1,7 @@
 ﻿using FaceitParser.Helpers.Extensions;
 using FaceitParser.Models;
+using FaceitParser.Models.App;
+using FaceitParser.Models.Faceit;
 using System.Collections.Concurrent;
 
 namespace FaceitParser.Abstractions

@@ -2,6 +2,7 @@
 using FaceitParser.Data;
 using FaceitParser.Helpers;
 using FaceitParser.Models;
+using FaceitParser.Models.App;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

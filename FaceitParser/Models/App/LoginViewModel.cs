@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
-namespace FaceitParser.Models
+namespace FaceitParser.Models.App
 {
     public class LoginViewModel
     {

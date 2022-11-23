@@ -1,5 +1,6 @@
 ﻿using FaceitParser.Abstractions;
 using FaceitParser.Models;
+using FaceitParser.Models.Steam;
 using System.Text.Json;
 
 namespace FaceitParser.Services

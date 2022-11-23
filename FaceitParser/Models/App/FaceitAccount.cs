@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata;
 
-namespace FaceitParser.Models
+namespace FaceitParser.Models.App
 {
     public class FaceitAccount
     {

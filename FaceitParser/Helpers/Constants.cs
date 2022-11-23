@@ -1,4 +1,5 @@
 ﻿using FaceitParser.Models;
+using FaceitParser.Models.App;
 
 namespace FaceitParser.Helpers
 {

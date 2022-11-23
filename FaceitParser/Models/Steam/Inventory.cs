@@ -1,7 +1,7 @@
 ﻿using FaceitParser.Helpers;
 using System.Text.Json.Serialization;
 
-namespace FaceitParser.Models
+namespace FaceitParser.Models.Steam
 {
     public class Inventory
     {

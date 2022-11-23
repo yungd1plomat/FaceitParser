@@ -2,6 +2,8 @@
 using FaceitParser.Data;
 using FaceitParser.Helpers.Extensions;
 using FaceitParser.Models;
+using FaceitParser.Models.App;
+using FaceitParser.Models.Faceit;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;

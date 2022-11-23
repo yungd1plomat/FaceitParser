@@ -1,5 +1,6 @@
 ﻿using FaceitParser.Data;
 using FaceitParser.Models;
+using FaceitParser.Models.App;
 using FaceitParser.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

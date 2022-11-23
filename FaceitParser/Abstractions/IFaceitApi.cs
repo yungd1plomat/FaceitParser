@@ -1,4 +1,5 @@
 ﻿using FaceitParser.Models;
+using FaceitParser.Models.Faceit;
 using System.Numerics;
 
 namespace FaceitParser.Abstractions

@@ -1,4 +1,4 @@
-﻿namespace FaceitParser.Models
+﻿namespace FaceitParser.Models.App
 {
     public class Location
     {
