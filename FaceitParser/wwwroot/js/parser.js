@@ -37,6 +37,12 @@
                         '<span class="subtitle">Инвентарь от ($)</span> ' +
                         '<input name="MinPrice" id="MinPrice" placeholder="100" type="number" min="0" class="swal2-input" required>' +
                         '<p>' +
+                        '<span class="subtitle">Автодобавление в друзья</span> ' +
+                        '<select name="AutoAdd" class="swal2-select inline-flex" id="AutoAdd" required>' +
+                        '<option value="true">Включено</option>' +
+                        '<option value="false">Отключено</option>' +
+                        '</select> ' +
+                        '<p>' +
                         '<span class="subtitle">Прокси (ip:port:log:pass)</span> ' +
                         '<input name="Proxy" placeholder="41.5.151.88:5501:d1plomat:password1234" id="Proxy" class="swal2-input">' +
                         '<p>' +

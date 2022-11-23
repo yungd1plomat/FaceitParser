@@ -26,7 +26,7 @@ namespace FaceitParser.Abstractions
         /// <param name="delay"></param>
         /// <param name="maxLvl"></param>
         /// <param name="source"></param>
-        Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, int maxMatches, int minPrice, CancellationTokenSource source);
+        Task Create(string user, string name, FaceitApi faceitApi, Location location, int delay, int maxLvl, int maxMatches, int minPrice, bool autoAdd, CancellationTokenSource source);
 
         /// <summary>
         /// Отменяет и удаляет инстанс сервиса по названию

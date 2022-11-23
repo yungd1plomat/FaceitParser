@@ -61,6 +61,8 @@ namespace FaceitParser.Services
 
         private int _maxMatches { get; set; }
 
+        private bool _autoAdd { get; set; }
+
         private string _userId { get; set; }
 
 
@@ -83,13 +85,14 @@ namespace FaceitParser.Services
         private int _defaultDelay { get; set; }
 
 
-        public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int maxMatches, int minPrice, ApplicationDbContext playersContext, ApplicationDbContext friendsContext, string userId, CancellationToken cancellationToken)
+        public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int maxMatches, int minPrice, bool autoAdd, ApplicationDbContext playersContext, ApplicationDbContext friendsContext, string userId, CancellationToken cancellationToken)
         {
             _userId = userId;
             _steamApi = steamApi;
             Location = location;
             _maxLevel = maxLvl;
             _maxMatches = maxMatches;
+            _autoAdd = autoAdd;
             _cancellationToken = cancellationToken;
             _faceitApi = faceitapi;
             Name = name;
@@ -120,7 +123,8 @@ namespace FaceitParser.Services
         public async Task Start()
         {
             new Thread(async () => await LoopGames()).Start();
-            new Thread(async () => await LoopPlayers()).Start();
+            if (_autoAdd)
+                new Thread(async () => await LoopPlayers()).Start();
         }
 
         public async Task LoopGames()
@@ -192,7 +196,8 @@ namespace FaceitParser.Services
                     {
                         Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
                         SteamIds.Enqueue(player.ProfileId);
-                        _players.Enqueue(player);
+                        if (_autoAdd)
+                            _players.Enqueue(player);
                         Parsed.Increment();
                     }
                 });

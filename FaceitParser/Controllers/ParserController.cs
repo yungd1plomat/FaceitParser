@@ -88,7 +88,7 @@ namespace FaceitParser.Controllers
                 source.Dispose();
                 return RedirectToAction("Parser", "Parser", new { Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) });
             }
-            await _serviceResolver.Create(user.Id, model.Name, faceitApi, location, model.Delay, model.MaxLvl, model.MaxMatches, model.MinPrice, source);
+            await _serviceResolver.Create(user.Id, model.Name, faceitApi, location, model.Delay, model.MaxLvl, model.MaxMatches, model.MinPrice, model.AutoAdd, source);
             return Redirect($"~/parser/{model.Name}");
         }
 

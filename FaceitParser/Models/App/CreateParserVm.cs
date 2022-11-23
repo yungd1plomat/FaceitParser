@@ -32,6 +32,9 @@ namespace FaceitParser.Models
         [Range(0, int.MaxValue, ErrorMessage = "Минимальное значение для максимального количество матчей 0")]
         public int MaxMatches { get; set; }
 
+        [Required]
+        public bool AutoAdd { get; set; }
+
 
         [RegularExpression(@"(\d{1,3}\.){3}\d{1,3}:(\d+):(.*?):(.*)", ErrorMessage = "Неверный формат прокси")]
         public string? Proxy { get; set; }
