@@ -33,8 +33,8 @@
                         '<span class="subtitle">Максимальный лвл</span> ' +
                         '<input name="MaxLvl" placeholder="10" type="number" min="1" max="10" id="MaxLvl" class="swal2-input" required>' +
                         '<p>' +
-                        '<span class="subtitle">Максимально матчей</span> ' +
-                        '<input name="MaxMatches" placeholder="1000000" id="MaxMatches" type="number" min="0" class="swal2-input" required>' +
+                        '<span class="subtitle">Максимально матчей (0 - ignore)</span> ' +
+                        '<input name="MaxMatches" placeholder="0" id="MaxMatches" type="number" min="0" class="swal2-input" required>' +
                         '<p>' +
                         '<span class="subtitle">Задержка (мс)</span> ' +
                         '<input name="Delay" id="Delay" placeholder="2000" type="number" min="1000" class="swal2-input" required>' +

@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.Json.Nodes;
 using System.Text.Json;
 using System.Text;
+using FaceitParser.Models.Faceit;
 
 namespace FaceitParser.Services
 {
@@ -127,6 +128,23 @@ namespace FaceitParser.Services
             var ignoredPlayers = ignoreCountries is null ? filteredPlayers : filteredPlayers.Where(x => !ignoreCountries.Contains(x.Country));
 
             return ignoredPlayers;
+        }
+
+        public async Task<IEnumerable<Player>> GetPlayersAsync(IEnumerable<Player> players, string matchId, int maxMatches)
+        {
+            var initUrl = $"{baseUrl}/stats/v1/stats/users/lifetime?match_id={matchId}&game=csgo";
+            StringBuilder sb = new StringBuilder(initUrl);
+            foreach (var player in players)
+            {
+                sb.Append($"&player_ids={player.Id}");
+            }
+            var url = sb.ToString();
+            var playersStats = await client.GetFromJsonAsync<List<PlayerStats>>(url, cancellationToken);
+            foreach (var player in players)
+            {
+                player.Matches = playersStats?.FirstOrDefault(x => x.Player.Id == player.Id)?.Matches;
+            }
+            return players.Where(x => x.Matches <= maxMatches);
         }
 
         /// <inheritdoc/>

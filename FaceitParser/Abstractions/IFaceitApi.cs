@@ -61,6 +61,15 @@ namespace FaceitParser.Abstractions
         Task<IEnumerable<Player>> GetPlayersAsync(IEnumerable<Player> players, IEnumerable<string> countries, IEnumerable<string> ignoreCountries);
 
         /// <summary>
+        /// Получает пользователей у которых количество матчей не превышает указанное
+        /// </summary>
+        /// <param name="players">Массив пользователей</param>
+        /// <param name="matchId">Id матча</param>
+        /// <param name="maxMatches">Максимальное количество матчей</param>
+        /// <returns></returns>
+        Task<IEnumerable<Player>> GetPlayersAsync(IEnumerable<Player> players, string matchId, int maxMatches);
+
+        /// <summary>
         /// Получает данные о текущем авторизованном пользователе
         /// </summary>
         Task GetSelf();

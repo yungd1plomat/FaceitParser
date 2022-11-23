@@ -20,5 +20,7 @@ namespace FaceitParser.Models
 
         [JsonPropertyName("country")]
         public string Country { get; set; }
+
+        public int? Matches { get; set; }
     }
 }

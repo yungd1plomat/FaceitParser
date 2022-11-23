@@ -21,7 +21,7 @@ namespace FaceitParser.Services
 
         const int QUEUE_LIMIT = 20;
 
-        const int DELAYS_COUNT = 3;
+        const int DELAYS_COUNT = 4;
 
         const int INACCURACY = 3000;
 
@@ -157,7 +157,6 @@ namespace FaceitParser.Services
                     Log($"{ex.Message}:{ex.StackTrace}");
                     ProcessExceptions(ex);
                 }
-                await Task.Delay(Delay);
             }
         }
 
@@ -181,6 +180,12 @@ namespace FaceitParser.Services
             if (players is null || !players.Any())
                 return;
 
+            if (_maxMatches != 0)
+            {
+                await Task.Delay(Delay);
+                players = await _faceitApi.GetPlayersAsync(players, gameId, _maxMatches);
+            }
+
             var userBlacklist = _playersContext.Blacklists.Where(x => x.UserId == _userId).ToList();
             List<Thread> threads = new List<Thread>();
             foreach (var player in players)
@@ -194,7 +199,7 @@ namespace FaceitParser.Services
                     var price = await GetInventoryPrice(player).ConfigureAwait(false);
                     if (price >= _minPrice)
                     {
-                        Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {price}$");
+                        Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {player.Matches} matches, {price}$");
                         SteamIds.Enqueue(player.ProfileId);
                         if (_autoAdd)
                             _players.Enqueue(player);
