@@ -20,7 +20,7 @@ namespace FaceitParser
                     var db = services.GetRequiredService<ApplicationDbContext>();
                     await db.Database.MigrateAsync();
 
-                    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                     await IdentityDataInitializer.SeedData(userManager, roleManager);
                 }

@@ -13,15 +13,15 @@ namespace FaceitParser.Controllers
     [Authorize(Roles = "admin")]
     public class UsersController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
         private readonly RoleManager<IdentityRole> roleManager;
 
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
 
         private readonly ApplicationDbContext context;
 
-        public UsersController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext dbContext)
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext dbContext)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -63,7 +63,11 @@ namespace FaceitParser.Controllers
         {
             if (!roleManager.Roles.Any(x => x.Name == model.Role))
                 return BadRequest(ModelState);
-            var user = new IdentityUser(model.Username);
+            var user = new ApplicationUser() 
+            {
+                UserName = model.Username,
+                CreateDate = DateTimeOffset.UtcNow,
+            };
             var result = await userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
@@ -190,6 +194,7 @@ namespace FaceitParser.Controllers
                 {
                     UserName = user.UserName,
                     Role = roles.Contains("admin") ? "admin" : "user",
+                    CreateDateTime = user.CreateDate.ToOffset(TimeSpan.FromHours(3)).ToString("HH:mm dd.MM.yyyy"),
                 };
                 vm.Add(userViewmodel);
             }

@@ -16,9 +16,9 @@ namespace FaceitParser.Controllers
 
         private readonly ApplicationDbContext _dbContext;
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AccountsController(ApplicationDbContext applicationDb, UserManager<IdentityUser> userManager)
+        public AccountsController(ApplicationDbContext applicationDb, UserManager<ApplicationUser> userManager)
         {
             _dbContext = applicationDb;
             _userManager = userManager;

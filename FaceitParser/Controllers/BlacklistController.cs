@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.VisualBasic;
 
 namespace FaceitParser.Controllers
@@ -17,9 +16,9 @@ namespace FaceitParser.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public BlacklistController(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager)
+        public BlacklistController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _context = dbContext;
             _userManager = userManager;

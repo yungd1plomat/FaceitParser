@@ -1,8 +1,9 @@
 ﻿@using FaceitParser.Abstractions
+@using FaceitParser.Data;
 @using FaceitParser.Models
 @using Microsoft.AspNetCore.Identity
 @inject IServiceResolver serviceResolver
-@inject UserManager<IdentityUser> userManager
+@inject UserManager<ApplicationUser> userManager
 
 <head>
     <meta charset="utf-8" />

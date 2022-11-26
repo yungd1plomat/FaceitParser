@@ -1,4 +1,5 @@
-﻿using FaceitParser.Models;
+﻿using FaceitParser.Data;
+using FaceitParser.Models;
 using FaceitParser.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,11 +14,11 @@ namespace FaceitParser.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private readonly SignInManager<IdentityUser> _singInManager;
+        private readonly SignInManager<ApplicationUser> _singInManager;
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public HomeController(ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _singInManager = signInManager;

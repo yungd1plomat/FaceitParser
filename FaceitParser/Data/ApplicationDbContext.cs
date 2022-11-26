@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FaceitParser.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<BlacklistModel> Blacklists { get; set; }
 
@@ -15,6 +15,11 @@ namespace FaceitParser.Data
             : base(options)
         {
 
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
         }
     }
 }

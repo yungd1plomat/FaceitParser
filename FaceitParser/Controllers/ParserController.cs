@@ -20,11 +20,11 @@ namespace FaceitParser.Controllers
 
         private readonly IServiceResolver _serviceResolver;
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly ApplicationDbContext _dbContext;
 
-        public ParserController(IServiceResolver serviceResolver, UserManager<IdentityUser> userManager, ApplicationDbContext dbContext, ILogger<HomeController> logger)
+        public ParserController(IServiceResolver serviceResolver, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, ILogger<HomeController> logger)
         {
             _logger = logger;
             _serviceResolver = serviceResolver; 
