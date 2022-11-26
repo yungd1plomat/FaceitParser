@@ -168,8 +168,8 @@ namespace FaceitParser.Services
             while (!_cancellationToken.IsCancellationRequested &&
                    _autoAdd &&
                    !_limited &&
-                   !_needRestart && 
-                   players.Any() && 
+                   !_needRestart &&
+                   players.Any() &&
                    players.TryDequeue(out Player player))
             {
                 try
@@ -212,7 +212,6 @@ namespace FaceitParser.Services
                 await Task.Delay(Delay);
                 players = await _faceitApi.GetPlayersAsync(players, gameId, _maxMatches);
             }
-
             var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
             List<Thread> threads = new List<Thread>();
             ConcurrentQueue<Player> filteredPlayers = new ConcurrentQueue<Player>();
@@ -224,7 +223,7 @@ namespace FaceitParser.Services
                     continue;
                 var thread = new Thread(async () =>
                 {
-                    var price = await GetInventoryPrice(player);
+                    var price = _autoAdd ? GetInventoryPrice(player).GetAwaiter().GetResult() : await GetInventoryPrice(player);
                     if (price >= _minPrice)
                     {
                         Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {player.Matches} matches, {price}$");
