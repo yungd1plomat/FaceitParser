@@ -21,6 +21,7 @@ namespace FaceitParser.Services
 
         const int LOOP_DELAY = 4000;
 
+        const int PARSE_LIMIT = 30;
 
         public string Name { get; private set; }
 
@@ -130,9 +131,14 @@ namespace FaceitParser.Services
                     await Task.Delay(Delay);
                     foreach (var gameId in gameIds)
                     {
-                        Games.Increment();
+                        if (Parsed.value >= PARSE_LIMIT)
+                        {
+                            _limited = true;
+                            Log($"Достигнут лимит парсинга для текущей инстанции {Parsed.value}/{PARSE_LIMIT}");
+                        }
                         if (_cancellationToken.IsCancellationRequested || _limited)
                             break;
+                        Games.Increment();
                         var players = await GetFilteredPlayers(gameId);
                         if (players is null || !players.Any())
                             continue;
