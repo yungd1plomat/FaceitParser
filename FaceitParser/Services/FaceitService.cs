@@ -21,12 +21,6 @@ namespace FaceitParser.Services
 
         const int LOOP_DELAY = 4000;
 
-        const int QUEUE_LIMIT = 20;
-
-        const int DELAYS_COUNT = 4;
-
-        const int INACCURACY = 3000;
-
 
         public string Name { get; private set; }
 
@@ -43,7 +37,7 @@ namespace FaceitParser.Services
 
         public ConcurrentQueue<string> Logs { get; set; }
 
-        public ConcurrentQueue<ulong> SteamIds { get; set; }
+        public ConcurrentQueue<string> SteamIds { get; set; }
 
         public Location Location { get; set; }
 
@@ -70,8 +64,6 @@ namespace FaceitParser.Services
 
         private CancellationToken _cancellationToken { get; set; }
 
-        private ConcurrentQueue<Player> _players { get; set; }
-
         private ApplicationDbContext _context { get; set; }
 
 
@@ -81,8 +73,6 @@ namespace FaceitParser.Services
         private bool _limited { get; set; }
 
         private bool _needRestart { get; set; }
-
-        private int _defaultDelay { get; set; }
 
 
         public FaceitService(ISteamApi steamApi, string name,  Location location, IFaceitApi faceitapi, int delay, int maxLvl, int maxMatches, int minPrice, bool autoAdd, ApplicationDbContext context, string userId, CancellationToken cancellationToken)
@@ -98,13 +88,11 @@ namespace FaceitParser.Services
             Name = name;
             Delay = delay;
             Logs = new ConcurrentQueue<string>();
-            SteamIds = new ConcurrentQueue<ulong>();
-            _players = new ConcurrentQueue<Player>();
+            SteamIds = new ConcurrentQueue<string>();
             _minPrice = minPrice;
             _context = context;
             _limited = false;
             _needRestart = false;
-            _defaultDelay = delay;
             Added = new ConcurrentInt();
             Games = new ConcurrentInt();
             Total = new ConcurrentInt();
@@ -119,11 +107,10 @@ namespace FaceitParser.Services
             Log($"Получено {_items.Count()} предметов с маркета");
         }
 
-        public async Task Start()
+        public Task Start()
         {
-            new Thread(async () => await LoopGames()).Start();
-            if (_autoAdd)
-                new Thread(async () => await LoopPlayers()).Start();
+            Task.Run(LoopGames);
+            return Task.CompletedTask;
         }
 
         public async Task LoopGames()
@@ -143,10 +130,20 @@ namespace FaceitParser.Services
                     await Task.Delay(Delay);
                     foreach (var gameId in gameIds)
                     {
+                        Games.Increment();
                         if (_cancellationToken.IsCancellationRequested || _limited)
                             break;
-                        await ProcessGame(gameId);
-                        Games.Increment();
+                        var players = await GetFilteredPlayers(gameId);
+                        if (players is null || !players.Any())
+                            continue;
+                        var blacklists = players.Select(x => new BlacklistModel()
+                        {
+                            ProfileId = x.ProfileId,
+                            UserId = _userId,
+                        });
+                        _context.Blacklists.AddRange(blacklists);
+                        await AddPlayers(players);
+                        await _context.SaveChangesAsync();
                         await Task.Delay(Delay);
                     }
                     offset += gameIds.Count();
@@ -159,27 +156,52 @@ namespace FaceitParser.Services
             }
         }
 
-        private void ProcessExceptions(Exception ex)
+        public async Task AddPlayers(ConcurrentQueue<Player> players)
         {
-            if (ex.Message.ToLower().Contains("cannot open when state is connecting"))
+            int addDelay = Delay;
+            while (!_cancellationToken.IsCancellationRequested &&
+                   _autoAdd &&
+                   !_limited &&
+                   !_needRestart && 
+                   players.Any() && 
+                   players.TryDequeue(out Player player))
             {
-                _needRestart = true;
-                Log($"Требуется перезапуск парсера..");
+                try
+                {
+                    await _faceitApi.AddFriendsAsync(new Player[] { player });
+                    _account.FriendRequests++;
+                    Added.Increment();
+                    Log($"Добавили {player.Nick}");
+                    addDelay = Delay;
+                }
+                catch (Exception ex)
+                {
+                    players.Enqueue(player);
+                    Log(ex.Message);
+                    addDelay = LOOP_DELAY;
+                }
+                if (_account.FriendRequests >= LIMIT)
+                {
+                    _limited = true;
+                    Log($"Достигнут лимит друзей на аккаунте {_account.FriendRequests}/{LIMIT}");
+                    break;
+                }
+                await Task.Delay(addDelay);
             }
         }
 
-        private async Task ProcessGame(string gameId)
+        public async Task<ConcurrentQueue<Player>?> GetFilteredPlayers(string gameId)
         {
             var initPlayers = await _faceitApi.GetPlayersAsync(gameId, _maxLevel);
             if (initPlayers is null || !initPlayers.Any()) 
-                return;
+                return null;
             await Task.Delay(Delay);
 
             var players = await _faceitApi.GetPlayersAsync(initPlayers, Location.Countries, Location.IgnoreCountries);
             if (players is null || !players.Any())
-                return;
+                return null;
 
-            if (_maxMatches != 0)
+            if (_maxMatches != 0) 
             {
                 await Task.Delay(Delay);
                 players = await _faceitApi.GetPlayersAsync(players, gameId, _maxMatches);
@@ -187,21 +209,21 @@ namespace FaceitParser.Services
 
             var userBlacklist = _context.Blacklists.Where(x => x.UserId == _userId).ToList();
             List<Thread> threads = new List<Thread>();
+            ConcurrentQueue<Player> filteredPlayers = new ConcurrentQueue<Player>();
             foreach (var player in players)
             {
                 if (_cancellationToken.IsCancellationRequested || _limited)
                     break;
+                if (userBlacklist.Any(x => x.ProfileId == player.ProfileId))
+                    continue;
                 var thread = new Thread(async () =>
                 {
-                    if (userBlacklist?.Any(x => x.ProfileId == player.ProfileId) == true)
-                        return;
-                    var price = await GetInventoryPrice(player).ConfigureAwait(false);
+                    var price = await GetInventoryPrice(player);
                     if (price >= _minPrice)
                     {
                         Log($"Спарсили {player.Nick} - {player.Level} LVL, {player.Country}, {player.Matches} matches, {price}$");
-                        SteamIds.Enqueue(player.ProfileId);
-                        if (_autoAdd)
-                            _players.Enqueue(player);
+                        SteamIds.Enqueue(player.ProfileId.ToString());
+                        filteredPlayers.Enqueue(player);
                         Parsed.Increment();
                     }
                 });
@@ -210,27 +232,8 @@ namespace FaceitParser.Services
             }
             foreach (var thread in threads)
                 thread.Join();
-            var blacklist = players.Select(x => new BlacklistModel()
-            {
-                ProfileId = x.ProfileId,
-                UserId = _userId,
-            });
-            if (blacklist.Any())
-                _context.Blacklists.AddRange(blacklist);
-            await _context.SaveChangesAsync(_cancellationToken);
             Total.Add(initPlayers.Count());
-        }
-
-        private void CalculateDelay()
-        {
-            if (_players.Count == 0)
-                Delay = _defaultDelay;
-            if (_players.Count >= QUEUE_LIMIT)
-            {
-                // Получаем делей, при котором парсер дождется добавления в друзья всех игроков
-                int stopDelay = ((_players.Count * LOOP_DELAY) / DELAYS_COUNT) + INACCURACY;
-                Delay = stopDelay;
-            }
+            return filteredPlayers;
         }
 
         public async Task<double> GetInventoryPrice(Player player)
@@ -253,37 +256,12 @@ namespace FaceitParser.Services
             return Math.Round(price, 3);
         }
 
-        public async Task LoopPlayers()
+        private void ProcessExceptions(Exception ex)
         {
-            while (!_cancellationToken.IsCancellationRequested && !_limited && !_needRestart)
+            if (ex.Message.ToLower().Contains("cannot open when state is connecting"))
             {
-                if (!_players.TryDequeue(out Player player))
-                    continue;
-                CalculateDelay();
-                try
-                {
-                    if (_account.FriendRequests >= LIMIT)
-                    {
-                        _limited = true;
-                        Log($"Достигнут лимит друзей на аккаунте {_account.FriendRequests}/{LIMIT}");
-                        break;
-                    }
-                    await _faceitApi.AddFriendsAsync(new Player[] { player });
-                    Log($"Добавили {player.Nick}");
-                    var model = new BlacklistModel()
-                    {
-                        ProfileId = player.ProfileId,
-                        UserId = _userId,
-                    };
-                    _account.FriendRequests++;
-                    Added.Increment();
-                }
-                catch (Exception ex)
-                {
-                    _players.Enqueue(player);
-                    Log(ex.Message);
-                }
-                await Task.Delay(LOOP_DELAY);
+                _needRestart = true;
+                Log($"Требуется перезапуск парсера..");
             }
         }
 
@@ -298,9 +276,10 @@ namespace FaceitParser.Services
             var faceitApi = (_faceitApi as FaceitApi);
             faceitApi.Dispose();
             Logs.Clear();
-            _players.Clear();
             _items.Clear();
             _context.Dispose();
         }
+
+
     }
 }

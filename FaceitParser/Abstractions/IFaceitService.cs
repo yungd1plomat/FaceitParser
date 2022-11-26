@@ -57,7 +57,7 @@ namespace FaceitParser.Abstractions
         /// <summary>
         /// Содержит спаршенные SteamId64
         /// </summary>
-        ConcurrentQueue<ulong> SteamIds { get; set; }
+        ConcurrentQueue<string> SteamIds { get; set; }
 
         /// <summary>
         /// Инициализирует новый инстанс сервиса
@@ -70,15 +70,15 @@ namespace FaceitParser.Abstractions
         Task Start();
 
         /// <summary>
-        /// Парсит игроков матчей с указанными в конструкторе параметрами
+        /// Возвращает отфильтрованных игроков с матча
         /// </summary>
-        /// <returns></returns>
-        Task LoopGames();
+        Task<ConcurrentQueue<Player>?> GetFilteredPlayers(string gameId);
 
         /// <summary>
-        /// Добавляет игроков в друзья по 100 человек из очереди
+        /// Добавляет игроков в друзья
         /// </summary>
-        Task LoopPlayers();
+        /// <param name="players">игроки которых нужно добавить в друзья</param>
+        Task AddPlayers(ConcurrentQueue<Player> players);
 
         /// <summary>
         /// Получает стоимость инвентаря игрока
