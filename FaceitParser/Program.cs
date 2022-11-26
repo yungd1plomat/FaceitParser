@@ -22,7 +22,7 @@ namespace FaceitParser
 
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    await IdentityDataInitializer.SeedData(userManager, roleManager);
+                    await IdentityDataInitializer.SeedData(db, userManager, roleManager);
                 }
                 catch (Exception ex)
                 {
