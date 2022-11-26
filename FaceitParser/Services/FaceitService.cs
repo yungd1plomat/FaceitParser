@@ -21,7 +21,7 @@ namespace FaceitParser.Services
 
         const int LOOP_DELAY = 4000;
 
-        const int PARSE_LIMIT = 30;
+        const int PARSE_LIMIT = 1000;
 
         public string Name { get; private set; }
 
@@ -138,8 +138,8 @@ namespace FaceitParser.Services
                         }
                         if (_cancellationToken.IsCancellationRequested || _limited)
                             break;
-                        Games.Increment();
                         var players = await GetFilteredPlayers(gameId);
+                        Games.Increment();
                         if (players is null || !players.Any())
                             continue;
                         var blacklists = players.Select(x => new BlacklistModel()
