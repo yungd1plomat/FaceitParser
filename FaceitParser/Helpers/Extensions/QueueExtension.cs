@@ -4,9 +4,9 @@ namespace FaceitParser.Helpers
 {
     public static class QueueExtension
     {
-        public static IEnumerable<string> DequeueAll(this ConcurrentQueue<string> queue)
+        public static IEnumerable<T> DequeueAll<T>(this ConcurrentQueue<T> queue)
         {
-            while (queue.TryDequeue(out string result))
+            while (queue.TryDequeue(out T result) && result != null)
             {
                 yield return result;
             }

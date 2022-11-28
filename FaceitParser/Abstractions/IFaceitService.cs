@@ -70,15 +70,20 @@ namespace FaceitParser.Abstractions
         Task Start();
 
         /// <summary>
-        /// Возвращает отфильтрованных игроков с матча
+        /// Ассинхронно обрабатывает матч по Id
         /// </summary>
-        Task<ConcurrentQueue<Player>?> GetFilteredPlayers(string gameId);
+        Task ProcessGame(string gameId);
 
         /// <summary>
-        /// Добавляет игроков в друзья
+        /// Добавляет игроков в друзья из очереди
         /// </summary>
-        /// <param name="players">игроки которых нужно добавить в друзья</param>
-        Task AddPlayers(ConcurrentQueue<Player> players);
+        Task LoopPlayers();
+
+        /// <summary>
+        /// Добавляет игроков в blacklist
+        /// </summary>
+        /// <returns></returns>
+        Task LoopBlacklist();
 
         /// <summary>
         /// Получает стоимость инвентаря игрока
