@@ -1,3 +1,10 @@
+# Скриншоты
+![изображение](https://github.com/yungd1plomat/FaceitParser/assets/64736191/43dc7bab-2cd8-4f94-a50b-3c55c1b6bd49)
+![изображение](https://github.com/yungd1plomat/FaceitParser/assets/64736191/d2401d5d-57b2-4783-b818-c68b86ed0f67)
+![изображение](https://github.com/yungd1plomat/FaceitParser/assets/64736191/bbd8468d-dafc-4aa4-a912-e0737344a955)
+![upload_2022-11-23_18-56-40](https://github.com/yungd1plomat/FaceitParser/assets/64736191/b38eef07-d055-45c0-a700-02ab1fca8f86)
+
+
 # Введение
 
 Проект написан на C# NET 6.0, используется EF6, БД mysql 8.0.x.
